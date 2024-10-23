@@ -1,21 +1,40 @@
 {
-    "name": "ws_task",
-    "version": "1.0.0",
-    "description": "Template for the WebSocket remote control task",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-        "start": "node ./index.js",
-        "start:dev": "nodemon ./index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Andrei Auchynnikau",
-    "keywords": [],
-    "license": "ISC",
-    "devDependencies": {
-        "nodemon": "^2.0.16"
-    },
-    "dependencies": {
-        "ws": "^8.8.0"
-    }
+  "name": "battle-ship",
+  "version": "1.0.0",
+  "description": "Websocket backend for Andrei Auchynnikau's battleship game template",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/eslint-config-prettier": "^6.11.3",
+    "@types/node": "^22.7.9",
+    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.11.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  },
+  "scripts": {
+    "start": "tsx ./index.ts",
+    "start:dev": "tsx --watch ./index.ts",
+    "lint": "eslint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/DmirtyUsov/battle-ship.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "WebSocket"
+  ],
+  "author": "Dima Usov <dmitry.usov@yahoo.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DmirtyUsov/battle-ship/issues"
+  },
+  "homepage": "https://github.com/DmirtyUsov/battle-ship#readme"
 }
