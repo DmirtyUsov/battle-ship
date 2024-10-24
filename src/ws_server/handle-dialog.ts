@@ -1,7 +1,5 @@
 import { RawData } from 'ws';
-import { Command, Signals } from '../models/command.model.js';
-import { Answer } from '../models/answer.model.js';
-import { WebSocketWithId } from '../models/web-socket-with-id.model.js';
+import { Answer, Command, Signals, WebSocketWithId } from '../models/index.js';
 
 export const handleDialog = (
   client: WebSocketWithId,

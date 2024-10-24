@@ -1,10 +1,8 @@
 import { RawData, WebSocketServer } from 'ws';
 import { WS_PORT } from '../config.js';
-import { WebSocketWithId } from '../models/web-socket-with-id.model.js';
 import * as logger from '../logger.js';
 import { handleDialog } from './handle-dialog.js';
-import { Signals } from '../models/command.model.js';
-import { Answer } from '../models/answer.model.js';
+import { Answer, Signals, WebSocketWithId } from '../models/index.js';
 
 export const wsServer = new WebSocketServer({ port: +WS_PORT });
 
