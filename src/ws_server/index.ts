@@ -2,7 +2,8 @@ import { RawData, WebSocketServer } from 'ws';
 import { WS_PORT } from '../config.js';
 import * as logger from '../logger.js';
 import { handleDialog } from './handle-dialog.js';
-import { Answer, Signals, WebSocketWithId } from '../models/index.js';
+import { Answer, Signals, WebSocketExt } from '../models/index.js';
+import { unlinkPlayer } from '../controllers/unlink-player.controller.js';
 
 export const wsServer = new WebSocketServer({ port: +WS_PORT });
 
@@ -11,7 +12,7 @@ let nextClientId = 1;
 wsServer.on('listening', () =>
   console.log(`WebSocketServer is running on port: ${WS_PORT}`),
 );
-wsServer.on('connection', (client: WebSocketWithId) => {
+wsServer.on('connection', (client: WebSocketExt) => {
   client.id = nextClientId;
   nextClientId += 1;
   logger.logClientConnected(client.id);
@@ -26,7 +27,13 @@ wsServer.on('connection', (client: WebSocketWithId) => {
 
   client.on('error', console.error);
 
-  client.on('close', () => logger.logClientDisconnected(client.id));
+  client.on('close', () => {
+    logger.logClientDisconnected(client.id);
+    const response = unlinkPlayer(client);
+    if (response) {
+      sendAnswers([response]);
+    }
+  });
 });
 
 wsServer.on('close', () => console.log(`Server close`, wsServer.clients.size));

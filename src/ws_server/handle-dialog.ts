@@ -4,12 +4,12 @@ import {
   Command,
   Player,
   Signals,
-  WebSocketWithId,
+  WebSocketExt,
 } from '../models/index.js';
 import { loginOrCreatePlayer } from '../controllers/index.js';
 
 export const handleDialog = (
-  client: WebSocketWithId,
+  client: WebSocketExt,
   rawData: RawData,
 ): Answer[] => {
   let request: Command<unknown> | undefined;

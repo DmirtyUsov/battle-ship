@@ -1,4 +1,4 @@
-import { Player, PlayersDBOutput, WebSocketWithId } from '../models/index.js';
+import { Player, PlayersDBOutput, WebSocketExt } from '../models/index.js';
 
 type Players = { [name: string]: Player };
 
@@ -24,10 +24,7 @@ class PlayersDB {
     return { ...newPlayer };
   }
 
-  setClient(
-    name: string,
-    client: WebSocketWithId | undefined,
-  ): PlayersDBOutput {
+  setClient(name: string, client: WebSocketExt | undefined): PlayersDBOutput {
     let player = this.get(name);
 
     if (player) {

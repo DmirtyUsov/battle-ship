@@ -5,12 +5,12 @@ import {
   LoginResult,
   Player,
   Signals,
-  WebSocketWithId,
+  WebSocketExt,
 } from '../models/index.js';
 
 export const loginOrCreatePlayer = (
   command: Command<Player>,
-  fromClient: WebSocketWithId,
+  client: WebSocketExt,
 ): Answer => {
   const { name, password } = command.data;
 
@@ -27,7 +27,7 @@ export const loginOrCreatePlayer = (
       data: loginResult,
       id: 0,
     },
-    client: fromClient,
+    client,
   };
 
   if (command.type !== Signals.REG) {
@@ -47,7 +47,7 @@ export const loginOrCreatePlayer = (
   if (!player) {
     const newPlayer = playersDB.add({ name, password });
     if (newPlayer) {
-      playersDB.setClient(name, fromClient);
+      linkPlayerClient(name, client);
       loginResult.error = false;
       loginResult.errorText = '';
     }
@@ -64,5 +64,14 @@ export const loginOrCreatePlayer = (
     return response;
   }
 
+  linkPlayerClient(name, client);
+  loginResult.error = false;
+  loginResult.errorText = '';
+
   return response;
+};
+
+const linkPlayerClient = (name: string, client: WebSocketExt): void => {
+  playersDB.setClient(name, client);
+  client.playerName = name;
 };

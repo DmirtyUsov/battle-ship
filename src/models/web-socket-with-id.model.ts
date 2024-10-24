@@ -1,4 +1,5 @@
 import { WebSocket } from 'ws';
-export interface WebSocketWithId extends WebSocket {
+export interface WebSocketExt extends WebSocket {
   id: number;
+  playerName?: string;
 }
