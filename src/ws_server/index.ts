@@ -41,6 +41,8 @@ const sendAnswers = (responses: Answer[]): void => {
     logger.logServerResponse(client.id);
     console.log(command);
     try {
+      const data = JSON.stringify(command.data);
+      command.data = data;
       const message = JSON.stringify(command);
       client.send(message);
     } catch (error) {
