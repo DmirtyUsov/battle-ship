@@ -21,7 +21,7 @@ export const loginOrCreatePlayer = (
     errorText: 'Something wrong.',
   };
 
-  const response = {
+  const response: Answer = {
     command: {
       type: Signals.REG,
       data: loginResult,

@@ -38,20 +38,31 @@ wsServer.on('connection', (client: WebSocketExt) => {
 
 wsServer.on('close', () => console.log(`Server close`, wsServer.clients.size));
 
+const commandsToAll = [Signals.UPDATE_ROOM];
+
 const sendAnswers = (responses: Answer[]): void => {
   responses.forEach((response) => {
     const { command, client } = response;
+
     if (command.type === Signals.NOT_GET_IT) {
       console.error('Error:', response.command.data);
       return;
     }
-    logger.logServerResponse(client.id);
-    console.log(command);
+
+    const clientsList = commandsToAll.includes(command.type)
+      ? wsServer.clients
+      : [client];
+
     try {
       const data = JSON.stringify(command.data);
       command.data = data;
       const message = JSON.stringify(command);
-      client.send(message);
+      for (const dstClient of clientsList) {
+        const client = dstClient as WebSocketExt;
+        logger.logServerResponse(client.id);
+        client.send(message);
+      }
+      console.log(command);
     } catch (error) {
       const message = (error as Error).message;
       console.error('Error', message);

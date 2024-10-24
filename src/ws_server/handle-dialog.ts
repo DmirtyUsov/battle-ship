@@ -6,7 +6,11 @@ import {
   Signals,
   WebSocketExt,
 } from '../models/index.js';
-import { loginOrCreatePlayer } from '../controllers/index.js';
+import {
+  createRoom,
+  loginOrCreatePlayer,
+  updateRoomState,
+} from '../controllers/index.js';
 
 export const handleDialog = (
   client: WebSocketExt,
@@ -15,18 +19,18 @@ export const handleDialog = (
   let request: Command<unknown> | undefined;
   const responses: Answer[] = [];
 
-  const firstResponse: Answer = {
+  const responseBad: Answer = {
     command: { type: Signals.NOT_GET_IT, data: '', id: 0 },
     client,
   };
-  responses.push(firstResponse);
+  responses.push(responseBad);
 
   try {
     request = JSON.parse(rawData.toString());
     console.log(request);
   } catch (error) {
     const message = (error as Error).message;
-    firstResponse.command.data = message;
+    responseBad.command.data = message;
   }
 
   if (!request) {
@@ -35,7 +39,7 @@ export const handleDialog = (
 
   const { type, data, id } = request;
   if (type === undefined || data === undefined || id !== 0) {
-    firstResponse.command.data = 'Wrong command format';
+    responseBad.command.data = 'Wrong command format';
     return responses;
   }
 
@@ -45,20 +49,28 @@ export const handleDialog = (
       request.data = payload;
     } catch (error) {
       const message = (error as Error).message;
-      firstResponse.command.data = message;
+      responseBad.command.data = message;
       return responses;
     }
   }
 
   switch (type) {
     case Signals.REG: {
-      const result = loginOrCreatePlayer(request as Command<Player>, client);
       responses.pop();
-      responses.push(result);
+      const response1 = loginOrCreatePlayer(request as Command<Player>, client);
+      responses.push(response1);
+      const response2 = updateRoomState(client);
+      responses.push(response2);
+      break;
+    }
+    case Signals.CREATE_ROOM: {
+      responses.pop();
+      const response = createRoom(request as Command<string>, client);
+      responses.push(response);
       break;
     }
     default: {
-      firstResponse.command.data = 'Unknown command';
+      responseBad.command.data = 'Unknown command';
       break;
     }
   }
