@@ -7,11 +7,24 @@ import {
   Signals,
   WebSocketExt,
 } from '../models/index.js';
+import { makeBaseAnswerCheckCmdValidity } from './controller-guard.js';
 
 export const loginOrCreatePlayer = (
   command: Command<Player>,
   client: WebSocketExt,
 ): Answer => {
+  const controllerSignal = Signals.REG;
+
+  const { baseResponse, isCommandValid } = makeBaseAnswerCheckCmdValidity(
+    command,
+    client,
+    controllerSignal,
+  );
+
+  if (!isCommandValid) {
+    return baseResponse;
+  }
+
   const { name, password } = command.data;
 
   const loginResult: LoginResult = {
@@ -21,25 +34,12 @@ export const loginOrCreatePlayer = (
     errorText: 'Something wrong.',
   };
 
-  const response: Answer = {
-    command: {
-      type: Signals.REG,
-      data: loginResult,
-      id: 0,
-    },
-    client,
-  };
-
-  if (command.type !== Signals.REG) {
-    response.command.type = Signals.NOT_GET_IT;
-    (response.command.data as unknown) = `Wrong type for loginOrCreatePlayer`;
-    return response;
-  }
+  baseResponse.command.data = loginResult;
+  baseResponse.command.type = Signals.REG;
 
   if (!name) {
-    response.command.type = Signals.NOT_GET_IT;
-    (response.command.data as unknown) = 'Empty name.';
-    return response;
+    (baseResponse.command.data as unknown) = 'Empty name.';
+    return baseResponse;
   }
 
   const player = playersDB.get(name);
@@ -51,24 +51,24 @@ export const loginOrCreatePlayer = (
       loginResult.error = false;
       loginResult.errorText = '';
     }
-    return response;
+    return baseResponse;
   }
 
   if (player.password !== password) {
     loginResult.errorText = 'Wrong Password.';
-    return response;
+    return baseResponse;
   }
 
   if (player.clientId) {
     loginResult.errorText = 'Player already logged in.';
-    return response;
+    return baseResponse;
   }
 
   linkPlayerClient(name, client);
   loginResult.error = false;
   loginResult.errorText = '';
 
-  return response;
+  return baseResponse;
 };
 
 const linkPlayerClient = (name: string, client: WebSocketExt): void => {

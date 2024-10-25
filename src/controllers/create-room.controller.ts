@@ -1,43 +1,27 @@
 import { playersDB, roomsDB } from '../dbs/index.js';
-import {
-  Answer,
-  Command,
-  Signals,
-  WebSocketExt,
-} from '../models/index.js';
+import { Answer, Command, Signals, WebSocketExt } from '../models/index.js';
+import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
 import { updateRoomState } from './index.js';
 
 export const createRoom = (
   command: Command<string>,
   client: WebSocketExt,
 ): Answer => {
-  const { type } = command;
+  const controllerSignal = Signals.CREATE_ROOM;
 
-  let response: Answer = {
-    command: {
-      type: Signals.NOT_GET_IT,
-      data: `from ${Signals.CREATE_ROOM} controller`,
-      id: 0,
-    },
+  const { baseResponse, isCommandValid } = makeBaseAnswerCheckCmdPlayerValidity(
+    command,
     client,
-  };
+    controllerSignal,
+  );
 
-  if (type !== Signals.CREATE_ROOM) {
-    response.command.data = `Wrong controller for ${command.type}`;
-    return response;
+  if (!isCommandValid) {
+    return baseResponse;
   }
+
+  let response = baseResponse;
 
   const playerName = client.playerName || '';
-
-  if (!client.playerName) {
-    response.command.data = `Client #${client.id} not linked to player`;
-    return response;
-  }
-
-  if (!playersDB.checkExists(playerName)) {
-    response.command.data = `Player  ${playerName} does not exist`;
-    return response;
-  }
 
   if (playersDB.checkHasRoom(playerName)) {
     response.command.data = `Player ${playerName} already in the room`;
