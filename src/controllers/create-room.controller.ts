@@ -1,7 +1,6 @@
 import { playersDB, roomsDB } from '../dbs/index.js';
 import { Answer, Command, Signals, WebSocketExt } from '../models/index.js';
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
-import { updateRoomState } from './index.js';
 
 export const createRoom = (
   command: Command<string>,
@@ -19,7 +18,7 @@ export const createRoom = (
     return baseResponse;
   }
 
-  let response = baseResponse;
+  const response = baseResponse;
 
   const playerName = client.playerName || '';
 
@@ -31,7 +30,7 @@ export const createRoom = (
   const newRoom = roomsDB.add(playerName);
   if (newRoom) {
     playersDB.setRoom(playerName, newRoom.id);
-    response = updateRoomState(client);
+    response.command.type = Signals.VOID;
   }
 
   return response;

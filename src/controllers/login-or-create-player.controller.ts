@@ -72,6 +72,6 @@ export const loginOrCreatePlayer = (
 };
 
 const linkPlayerClient = (name: string, client: WebSocketExt): void => {
-  playersDB.setClient(name, client.id);
+  playersDB.setClient(name, client);
   client.playerName = name;
 };

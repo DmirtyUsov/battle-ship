@@ -7,7 +7,7 @@ import {
   WebSocketExt,
 } from '../models/index.js';
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
-import { updateRoomState } from './index.js';
+import { createGame } from './create-game.controller.js';
 
 export const addUserToRoom = (
   command: Command<RoomIndex>,
@@ -20,7 +20,7 @@ export const addUserToRoom = (
     client,
     controllerSignal,
   );
-  const responses = [baseResponse];
+  let responses = [baseResponse];
 
   if (!isCommandValid) {
     return responses;
@@ -44,6 +44,9 @@ export const addUserToRoom = (
 
   if (fullRoom) {
     playersDB.setRoom(playerName, fullRoom.id);
+    const responsesToRivals = createGame(fullRoom);
+    responses.pop();
+    responses = responsesToRivals;
   }
 
   return responses;

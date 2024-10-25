@@ -59,24 +59,28 @@ export const handleDialog = (
   switch (type) {
     case Signals.REG: {
       responses.pop();
-      const response1 = loginOrCreatePlayer(request as Command<Player>, client);
-      responses.push(response1);
-      const response2 = updateRoomState(client);
-      responses.push(response2);
+      const response = loginOrCreatePlayer(request as Command<Player>, client);
+      responses.push(response);
+      const broadcast = updateRoomState(client);
+      responses.push(broadcast);
       break;
     }
     case Signals.CREATE_ROOM: {
       responses.pop();
       const response = createRoom(request as Command<string>, client);
-      responses.push(response);
+      if (response.command.type !== Signals.VOID) {
+        responses.push(response);
+      }
+      const broadcast = updateRoomState(client);
+      responses.push(broadcast);
       break;
     }
     case Signals.ADD_USER_TO_ROOM: {
       responses.pop();
       const response = addUserToRoom(request as Command<RoomIndex>, client);
-      responses.push(response);
-      const response2 = updateRoomState(client);
-      responses.push(response2);
+      responses.push(response[0], response[1]);
+      const broadcast = updateRoomState(client);
+      responses.push(broadcast);
       break;
     }
     default: {

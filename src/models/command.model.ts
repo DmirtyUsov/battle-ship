@@ -12,11 +12,12 @@ export enum Signals {
   FINISH = 'finish',
   RANDOM_ATTACK = 'randomAttack',
   SINGLE_PLAY = 'single_play',
-  NOT_GET_IT='error',
+  NOT_GET_IT = 'server_error',
+  VOID = 'do_not_send',
 }
 
-export type Command<T> ={
+export type Command<T> = {
   type: Signals;
   data: T;
   id: number;
-}
+};

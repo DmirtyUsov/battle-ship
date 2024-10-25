@@ -1,12 +1,11 @@
-import {
-  Player,
-  PlayersDBOutput,
-} from '../models/index.js';
+import { Player, PlayersDBOutput, WebSocketExt } from '../models/index.js';
 
 type Players = { [name: string]: Player };
+type Clients = { [name: string]: WebSocketExt | undefined };
 
 class PlayersDB {
   private players: Players = {};
+  private clients: Clients = {};
 
   get(name: string): PlayersDBOutput {
     let player: PlayersDBOutput = null;
@@ -27,15 +26,20 @@ class PlayersDB {
     return { ...newPlayer };
   }
 
-  setClient(name: string, clientId: number | undefined): PlayersDBOutput {
+  setClient(name: string, client: WebSocketExt | undefined): PlayersDBOutput {
     let player = this.get(name);
 
     if (player) {
-      this.players[name].clientId = clientId;
+      this.clients[name] = client;
+      this.players[name].clientId = client?.id;
       player = { ...this.players[name] };
     }
 
     return player;
+  }
+
+  getClient(name: string): WebSocketExt | undefined {
+    return this.clients[name];
   }
 
   setRoom(name: string, roomId: number | undefined): PlayersDBOutput {
