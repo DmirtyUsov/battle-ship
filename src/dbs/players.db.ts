@@ -1,4 +1,7 @@
-import { Player, PlayersDBOutput, WebSocketExt } from '../models/index.js';
+import {
+  Player,
+  PlayersDBOutput,
+} from '../models/index.js';
 
 type Players = { [name: string]: Player };
 
@@ -24,15 +27,39 @@ class PlayersDB {
     return { ...newPlayer };
   }
 
-  setClient(name: string, client: WebSocketExt | undefined): PlayersDBOutput {
+  setClient(name: string, clientId: number | undefined): PlayersDBOutput {
     let player = this.get(name);
 
     if (player) {
-      this.players[name].client = client;
+      this.players[name].clientId = clientId;
       player = { ...this.players[name] };
     }
 
     return player;
+  }
+
+  setRoom(name: string, roomId: number | undefined): PlayersDBOutput {
+    let player = this.get(name);
+
+    if (player) {
+      this.players[name].roomId = roomId;
+      player = { ...this.players[name] };
+    }
+
+    return player;
+  }
+
+  checkHasRoom(name: string): boolean {
+    const player = this.get(name);
+
+    if (player) {
+      return this.players[name].roomId === undefined ? false : true;
+    }
+    return false;
+  }
+
+  checkExists(name: string): boolean {
+    return this.get(name) ? true : false;
   }
 }
 

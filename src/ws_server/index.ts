@@ -45,7 +45,7 @@ const sendAnswers = (responses: Answer[]): void => {
     const { command, client } = response;
 
     if (command.type === Signals.NOT_GET_IT) {
-      console.error('Error:', response.command.data);
+      console.error('Server Error:', response.command.data);
       return;
     }
 
@@ -65,7 +65,7 @@ const sendAnswers = (responses: Answer[]): void => {
       console.log(command);
     } catch (error) {
       const message = (error as Error).message;
-      console.error('Error', message);
+      console.error('Send Error', message);
     }
   });
 };

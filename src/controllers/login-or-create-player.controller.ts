@@ -59,7 +59,7 @@ export const loginOrCreatePlayer = (
     return response;
   }
 
-  if (player.client) {
+  if (player.clientId) {
     loginResult.errorText = 'Player already logged in.';
     return response;
   }
@@ -72,6 +72,6 @@ export const loginOrCreatePlayer = (
 };
 
 const linkPlayerClient = (name: string, client: WebSocketExt): void => {
-  playersDB.setClient(name, client);
+  playersDB.setClient(name, client.id);
   client.playerName = name;
 };

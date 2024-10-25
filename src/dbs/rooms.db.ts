@@ -1,4 +1,4 @@
-import { Room, RoomsDBOutput, RoomState, RoomUser } from '../models/index.js';
+import { Room, RoomState, RoomUser } from '../models/index.js';
 
 type Rooms = {
   [id: number]: Room;
@@ -8,20 +8,30 @@ class RoomsDB {
   private nextRoomId = 1;
   private rooms: Rooms = {};
 
-  add(name: string): RoomsDBOutput {
+  add(name: string): Room | null {
     const id = this.nextRoomId;
     this.nextRoomId += 1;
 
-    this.rooms[this.nextRoomId] = { id, players: [name] };
+    this.rooms[id] = { id, players: [name] };
     return this.get(id);
   }
 
-  get(id: number): RoomsDBOutput {
+  get(id: number): Room | null {
     const room = this.rooms[id];
     if (room) {
       return { ...room };
     }
+
     return null;
+  }
+
+  delete(id: number): Room | null {
+    const room = this.get(id);
+    if (room) {
+      delete this.rooms[id];
+    }
+
+    return room;
   }
 
   getRoomsSinglePlayer(): RoomState[] {

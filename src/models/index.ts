@@ -5,6 +5,5 @@ export * from './answer.model.js';
 export * from './command.model.js';
 export * from './login-result.model.js';
 export * from './room.model.js';
-export * from './rooms-db-output.model.js';
 export * from './room-state.model.js';
 export * from './room-user.model.js';
