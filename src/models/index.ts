@@ -7,3 +7,5 @@ export * from './login-result.model.js';
 export * from './room.model.js';
 export * from './room-state.model.js';
 export * from './room-user.model.js';
+export * from './room-index.model.js';
+export * from './game-create.model.js';

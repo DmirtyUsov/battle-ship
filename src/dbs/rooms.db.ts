@@ -48,6 +48,22 @@ class RoomsDB {
         return state;
       });
   }
+
+  private checkTwoPlayers(roomId: number): boolean {
+    const room = this.get(roomId);
+    if (room) {
+      return room.players.length === 2;
+    }
+    return false;
+  }
+
+  addPlayerToRoom(name: string, roomId: number): Room | null {
+    if (!this.checkTwoPlayers(roomId)) {
+      this.rooms[roomId].players.push(name);
+      return this.get(roomId);
+    }
+    return null;
+  }
 }
 
 export const roomsDB = new RoomsDB();

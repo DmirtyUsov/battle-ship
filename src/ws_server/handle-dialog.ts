@@ -3,10 +3,12 @@ import {
   Answer,
   Command,
   Player,
+  RoomIndex,
   Signals,
   WebSocketExt,
 } from '../models/index.js';
 import {
+  addUserToRoom,
   createRoom,
   loginOrCreatePlayer,
   updateRoomState,
@@ -67,6 +69,14 @@ export const handleDialog = (
       responses.pop();
       const response = createRoom(request as Command<string>, client);
       responses.push(response);
+      break;
+    }
+    case Signals.ADD_USER_TO_ROOM: {
+      responses.pop();
+      const response = addUserToRoom(request as Command<RoomIndex>, client);
+      responses.push(response);
+      const response2 = updateRoomState(client);
+      responses.push(response2);
       break;
     }
     default: {
