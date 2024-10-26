@@ -1,6 +1,8 @@
-import { GameRival, Room } from './models/index.js';
+import { GameRival, Room, Ship } from './models/index.js';
 
-type GameRivals = { [id: string]: GameRival };
+type RivalIndex = string | number;
+type GameRivals = { [id: RivalIndex]: GameRival };
+
 export class Game {
   private rivals: GameRivals = {};
   constructor(room: Room) {
@@ -9,7 +11,19 @@ export class Game {
     this.rivals[rival2] = { playerName: rival2 };
   }
 
-  getRivals(): string[] {
+  getRivals(): RivalIndex[] {
     return Object.keys(this.rivals);
+  }
+
+  checkRival(name: RivalIndex): boolean {
+    return this.getRivals().includes(name);
+  }
+
+  setRivalShips(name: RivalIndex, ships: Ship[]): boolean {
+    const result = this.checkRival(name);
+    if (result) {
+      this.rivals[name].ships = ships;
+    }
+    return result;
   }
 }

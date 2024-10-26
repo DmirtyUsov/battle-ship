@@ -4,3 +4,4 @@ export * from './create-room.controller.js';
 export * from './update-room-state.controller.js';
 export * from './add-user-to-room.controller.js';
 export * from './create-game.controller.js';
+export * from './add-ships.controller.js';

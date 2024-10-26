@@ -10,3 +10,5 @@ export * from './room-user.model.js';
 export * from './room-index.model.js';
 export * from './game-create.model.js';
 export * from './game-rival.model.js';
+export * from './ship.model.js';
+export * from './ships-add.model.js';

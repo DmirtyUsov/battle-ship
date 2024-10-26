@@ -4,10 +4,12 @@ import {
   Command,
   Player,
   RoomIndex,
+  ShipsAdd,
   Signals,
   WebSocketExt,
 } from '../models/index.js';
 import {
+  addShips,
   addUserToRoom,
   createRoom,
   loginOrCreatePlayer,
@@ -65,24 +67,52 @@ export const handleDialog = (
       responses.push(broadcast);
       break;
     }
+
     case Signals.CREATE_ROOM: {
       responses.pop();
       const response = createRoom(request as Command<string>, client);
+
+      if (response.command.type !== Signals.VOID) {
+        responses.push(response);
+      } else {
+        const broadcast = updateRoomState(client);
+        responses.push(broadcast);
+      }
+
+      break;
+    }
+
+    case Signals.ADD_USER_TO_ROOM: {
+      responses.pop();
+
+      const [responseFirstRivalOrErr, responseSecondRival] = addUserToRoom(
+        request as Command<RoomIndex>,
+        client,
+      );
+      if (responseFirstRivalOrErr) {
+        responses.push(responseFirstRivalOrErr);
+      }
+      if (responseSecondRival) {
+        responses.push(responseSecondRival);
+
+        const broadcast = updateRoomState(client);
+        responses.push(broadcast);
+      }
+
+      break;
+    }
+
+    case Signals.ADD_SHIPS: {
+      responses.pop();
+
+      const response = addShips(request as Command<ShipsAdd>, client);
       if (response.command.type !== Signals.VOID) {
         responses.push(response);
       }
-      const broadcast = updateRoomState(client);
-      responses.push(broadcast);
+
       break;
     }
-    case Signals.ADD_USER_TO_ROOM: {
-      responses.pop();
-      const response = addUserToRoom(request as Command<RoomIndex>, client);
-      responses.push(response[0], response[1]);
-      const broadcast = updateRoomState(client);
-      responses.push(broadcast);
-      break;
-    }
+
     default: {
       responseBad.command.data = 'Unknown command';
       break;
