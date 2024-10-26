@@ -1,18 +1,13 @@
 import { gamesDB, playersDB } from '../dbs/index.js';
-import {
-  Answer,
-  GameCreate,
-  Room,
-  Signals,
-} from '../models/index.js';
+import { Answer, GameCreate, Room, Signals } from '../models/index.js';
 
 export const createGame = (room: Room): Answer[] => {
   const gameId = gamesDB.createGameForRoom(room);
   const game = gamesDB.get(gameId);
   const rivals = game.getRivals();
 
-  const rival1Response = makeResponseForRival(gameId, rivals[0]);
-  const rival2Response = makeResponseForRival(gameId, rivals[1]);
+  const rival1Response = makeResponseForRival(gameId, rivals[0] as string);
+  const rival2Response = makeResponseForRival(gameId, rivals[1] as string);
 
   return [rival1Response, rival2Response];
 };

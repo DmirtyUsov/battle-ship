@@ -12,3 +12,5 @@ export * from './game-create.model.js';
 export * from './game-rival.model.js';
 export * from './ship.model.js';
 export * from './ships-add.model.js';
+export * from './game-start.model.js';
+export * from './game-turn.model.js';

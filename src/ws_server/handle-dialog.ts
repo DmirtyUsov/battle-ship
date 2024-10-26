@@ -105,13 +105,20 @@ export const handleDialog = (
     case Signals.ADD_SHIPS: {
       responses.pop();
 
-      const response = addShips(request as Command<ShipsAdd>, client);
-      if (response.command.type !== Signals.VOID) {
-        responses.push(response);
-      }
+      const responsesForRivals = addShips(request as Command<ShipsAdd>, client);
+      responsesForRivals.forEach((response) => {
+        if (response.command.type !== Signals.VOID) {
+          responses.push(response);
+        }
+      });
 
       break;
     }
+
+    // case Signals.ATTACK: {
+    //   const responsesForRivals = 
+    //   break
+    // }
 
     default: {
       responseBad.command.data = 'Unknown command';

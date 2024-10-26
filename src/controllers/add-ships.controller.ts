@@ -8,11 +8,13 @@ import {
 } from '../models/index.js';
 
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
+import { startGame } from './start-game.controller.js';
+import { turn } from './turn.controller.js';
 
 export const addShips = (
   command: Command<ShipsAdd>,
   client: WebSocketExt,
-): Answer => {
+): Answer[] => {
   const controllerSignal = Signals.ADD_SHIPS;
 
   const { baseResponse, isCommandValid } = makeBaseAnswerCheckCmdPlayerValidity(
@@ -20,29 +22,37 @@ export const addShips = (
     client,
     controllerSignal,
   );
+  const responses = [baseResponse];
 
   if (!isCommandValid) {
-    return baseResponse;
+    return responses;
   }
-
-  const response = baseResponse;
 
   const { indexPlayer, gameId, ships } = command.data;
 
   const game = gamesDB.get(+gameId);
   if (!game) {
-    response.command.data = `Game with id ${gameId} does not exist`;
-    return baseResponse;
+    baseResponse.command.data = `Game with id ${gameId} does not exist`;
+    return responses;
   }
 
   if (!game.checkRival(indexPlayer)) {
-    response.command.data = `Game id ${gameId} does not have an indexPlayer ${indexPlayer}`;
-    return baseResponse;
+    baseResponse.command.data = `Game id ${gameId} does not have an indexPlayer ${indexPlayer}`;
+    return responses;
   }
 
   if (game.setRivalShips(indexPlayer, ships)) {
-    response.command.type = Signals.VOID;
+    baseResponse.command.type = Signals.VOID;
   }
 
-  return response;
+  if (game.checkFleetReadiness()) {
+    const [response1Viral, response2Viral] = startGame(game);
+    responses.pop();
+    responses.push(response1Viral);
+    responses.push(response2Viral);
+
+    turn(game).forEach((response) => responses.push(response));
+  }
+
+  return responses;
 };
