@@ -6,3 +6,4 @@ export * from './add-user-to-room.controller.js';
 export * from './create-game.controller.js';
 export * from './add-ships.controller.js';
 export * from './start-game.controller.js';
+export * from './attack.controller.js';

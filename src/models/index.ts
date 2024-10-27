@@ -14,3 +14,8 @@ export * from './ship.model.js';
 export * from './ships-add.model.js';
 export * from './game-start.model.js';
 export * from './game-turn.model.js';
+export * from './ship-position.model.js';
+export * from './ship-size.model.js';
+export * from './attack-status.model.js';
+export * from './attack-feedback.model.js';
+export * from './attack-params.model.js';

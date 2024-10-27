@@ -1,6 +1,7 @@
 import { RawData } from 'ws';
 import {
   Answer,
+  AttackParams,
   Command,
   Player,
   RoomIndex,
@@ -11,6 +12,7 @@ import {
 import {
   addShips,
   addUserToRoom,
+  attack,
   createRoom,
   loginOrCreatePlayer,
   updateRoomState,
@@ -24,7 +26,7 @@ export const handleDialog = (
   const responses: Answer[] = [];
 
   const responseBad: Answer = {
-    command: { type: Signals.NOT_GET_IT, data: '', id: 0 },
+    command: { type: Signals.NOT_GET_IT, data: 'from handleDialog', id: 0 },
     client,
   };
   responses.push(responseBad);
@@ -115,10 +117,21 @@ export const handleDialog = (
       break;
     }
 
-    // case Signals.ATTACK: {
-    //   const responsesForRivals = 
-    //   break
-    // }
+    case Signals.ATTACK: {
+      responses.pop();
+
+      const responsesForRivals = attack(
+        request as Command<AttackParams>,
+        client,
+      );
+      responsesForRivals.forEach((response) => {
+        if (response.command.type !== Signals.VOID) {
+          responses.push(response);
+        }
+      });
+
+      break;
+    }
 
     default: {
       responseBad.command.data = 'Unknown command';

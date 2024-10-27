@@ -3,6 +3,7 @@ import { Game } from '../game.js';
 import { Answer, Signals } from '../models/index.js';
 
 export const turn = (game: Game): Answer[] => {
+  const controllerSignal = Signals.TURN;
   const responses: Answer[] = [];
 
   const data = game.turn();
@@ -13,8 +14,8 @@ export const turn = (game: Game): Answer[] => {
 
     const response: Answer = {
       command: {
-        type: client ? Signals.TURN : Signals.NOT_GET_IT,
-        data,
+        type: client ? controllerSignal : Signals.NOT_GET_IT,
+        data: data ? data : `from ${controllerSignal} to player ${rival}`,
         id: 0,
       },
       client,

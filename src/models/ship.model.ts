@@ -1,9 +1,4 @@
-type Size = 'small' | 'medium' | 'large' | 'huge';
-
-type Position = {
-  x: number;
-  y: number;
-};
+import { Position, Size } from './index.js';
 
 export type Ship = {
   position: Position;
