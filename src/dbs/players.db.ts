@@ -53,6 +53,17 @@ class PlayersDB {
     return player;
   }
 
+  setGame(name: string, gameID: number | undefined): PlayersDBOutput {
+    let player = this.get(name);
+
+    if (player) {
+      this.players[name].gameId = gameID;
+      player = { ...this.players[name] };
+    }
+
+    return player;
+  }
+
   checkHasRoom(name: string): boolean {
     const player = this.get(name);
 
@@ -60,6 +71,14 @@ class PlayersDB {
       return this.players[name].roomId === undefined ? false : true;
     }
     return false;
+  }
+
+  getGameId(name: string): number | undefined {
+    const player = this.get(name);
+    if (player) {
+      return this.players[name].gameId;
+    }
+    return undefined;
   }
 
   checkExists(name: string): boolean {

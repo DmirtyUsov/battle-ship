@@ -31,7 +31,7 @@ wsServer.on('connection', (client: WebSocketExt) => {
     logger.logClientDisconnected(client.id);
     const response = unlinkPlayer(client);
     if (response) {
-      sendAnswers([response]);
+      sendAnswers(response);
     }
   });
 });

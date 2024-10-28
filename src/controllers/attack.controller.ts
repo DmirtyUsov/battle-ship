@@ -48,7 +48,9 @@ export const attack = (
     return responses;
   }
 
-  const position: Position = isRandom ? game.getRandomPosition() : { x, y };
+  const position: Position = isRandom
+    ? game.getRandomPositionForAttack(indexPlayer)
+    : { x, y };
 
   const feedbacks: GameOutput<AttackFeedback>[] | undefined = game.attack(
     indexPlayer,
@@ -79,7 +81,7 @@ export const attack = (
 
   const isGameOver = game.checkGameOver();
 
-  const nextMoves = isGameOver ? finish(game, gameId) : turn(game);
+  const nextMoves = isGameOver ? finish(gameId) : turn(game);
   nextMoves.forEach((response) => responses.push(response));
 
   if (isGameOver) {

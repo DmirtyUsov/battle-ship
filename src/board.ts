@@ -1,3 +1,4 @@
+import { DEV_ATTACKS_BEFORE_FORCE_GAME_OVER } from './config.js';
 import {
   AttackFeedback,
   AttackStatus,
@@ -11,10 +12,12 @@ type IndexWithAttackStatus = { index: number; status: AttackStatus };
 
 export class Board {
   private indexesWithShipParts = new Map<number, ShipPartsOnBoardHit>();
-  private tempAttacksBeforeFinish: number = 3;
+  private attacksBeforeFinish: number = DEV_ATTACKS_BEFORE_FORCE_GAME_OVER;
+  private randomCellsForAttacks: number[];
 
   constructor(ships: Ship[], private gridSize: number) {
     this.placeShips(ships);
+    this.randomCellsForAttacks = Board.makeRandomCells(gridSize);
   }
 
   private static convertPosition2Index(
@@ -34,11 +37,15 @@ export class Board {
     return { x, y };
   }
 
-  static getRandomPosition(gridSize: number): Position {
-    const min = 0;
-    const max = gridSize;
-    const idx = Math.floor(Math.random() * (max - min) + min);
-    return Board.convertIndex2Position(idx, gridSize);
+  private static makeRandomCells(gridSize: number): number[] {
+    const cells = [...Array(gridSize ** 2).keys()];
+    cells.sort(() => Math.random() - 0.5);
+    return cells;
+  }
+
+  getRandomPosition(): Position {
+    const idx = this.randomCellsForAttacks.pop();
+    return Board.convertIndex2Position(idx || 0, this.gridSize);
   }
 
   private placeShips(ships: Ship[]): void {
@@ -69,7 +76,7 @@ export class Board {
   private hitCell(index: number): IndexWithAttackStatus[] {
     let status: AttackStatus;
     const shipPartsHit = this.indexesWithShipParts.get(index);
-    this.tempAttacksBeforeFinish--;
+    this.attacksBeforeFinish--;
 
     if (!shipPartsHit) {
       status = 'miss';
@@ -116,7 +123,7 @@ export class Board {
 
   checkNoShipsOnBoard(): boolean {
     return (
-      this.indexesWithShipParts.size === 0 || this.tempAttacksBeforeFinish === 0
+      this.indexesWithShipParts.size === 0 || this.attacksBeforeFinish === 0
     );
   }
 }

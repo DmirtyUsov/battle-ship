@@ -12,3 +12,5 @@ export const WS_PORT: number = (process.env.WS_PORT ||
   DEFAULT_WS_PORT) as number;
 export const GRID_SIZE: number = (process.env.GRID_SIZE ||
   DEFAULT_GRID_SIZE) as number;
+export const DEV_ATTACKS_BEFORE_FORCE_GAME_OVER: number = (process.env
+  .DEV_ATTACKS_BEFORE_FORCE_GAME_OVER || -1) as number;

@@ -1,10 +1,23 @@
 import { gamesDB, playersDB, roomsDB, winnersDB } from '../dbs/index.js';
-import { Game } from '../game.js';
 import { Answer, Signals } from '../models/index.js';
 
-export const finish = (game: Game, gameId: number | string): Answer[] => {
+export const finish = (
+  gameId: number | string,
+  lostPlayerId: string = '',
+  isForceToFinish: boolean = false,
+): Answer[] => {
   const controllerSignal = Signals.FINISH;
   const responses: Answer[] = [];
+
+  const game = gamesDB.get(gameId as number);
+
+  if (!game) {
+    return responses;
+  }
+
+  if (isForceToFinish) {
+    game.forceFinish(lostPlayerId);
+  }
 
   const outputs = game.getFinishData();
 
@@ -24,7 +37,9 @@ export const finish = (game: Game, gameId: number | string): Answer[] => {
   });
 
   if (game.checkGameOver()) {
-    winnersDB.addWin(game.getWinner());
+    if (!isForceToFinish) {
+      winnersDB.addWin(game.getWinner());
+    }
     const rivals = game.getRivals();
     rivals.forEach((rival) => playersDB.setRoom(rival as string, undefined));
   }

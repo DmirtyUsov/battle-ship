@@ -6,6 +6,8 @@ export const createGame = (room: Room): Answer[] => {
   const game = gamesDB.get(gameId);
   const rivals = game.getRivals();
 
+  rivals.forEach((rival) => playersDB.setGame(rival as string, gameId));
+
   const rival1Response = makeResponseForRival(gameId, rivals[0] as string);
   const rival2Response = makeResponseForRival(gameId, rivals[1] as string);
 

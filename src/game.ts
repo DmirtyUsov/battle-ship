@@ -180,8 +180,16 @@ export class Game {
 
     return outputs;
   }
-
-  getRandomPosition(): Position {
-    return Board.getRandomPosition(GRID_SIZE);
+  private getBoard(rival: RivalIndex): Board | undefined {
+    return this.rivals[rival].board;
   }
+  getRandomPositionForAttack(attackerId: RivalIndex): Position {
+    const board = this.getBoard(attackerId);
+    const position = board ? board.getRandomPosition() : { x: 0, y: 0 };
+    return position;
+  }
+
+  forceFinish(winnerId: RivalIndex): void{
+    this.end(winnerId);
+  };
 }

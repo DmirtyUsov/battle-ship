@@ -3,4 +3,5 @@ export type Player = {
   password: string;
   clientId?: number;
   roomId?: number;
+  gameId?: number;
 };
