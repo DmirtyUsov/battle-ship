@@ -1,5 +1,5 @@
 import { Board } from './board.js';
-import { GRID_SIZE } from './config.js';
+import { BOT_ID, GRID_SIZE } from './config.js';
 import {
   AttackFeedback,
   GameFinish,
@@ -19,7 +19,7 @@ type State = 'setup' | 'on' | 'over';
 export class Game {
   private rivals: GameRivals = {};
   private state: State = 'setup';
-  private isFirstRivalInAttack = false;
+  private isFirstRivalInAttack = true;
   private winnerId: RivalIndex | undefined;
   private gameForRoomId: number | undefined;
 
@@ -56,6 +56,10 @@ export class Game {
     return result;
   }
 
+  setBotShips(name: RivalIndex): boolean {
+    return this.setRivalShips(name, BOT_SHIPS);
+  }
+
   checkFleetReadiness(): boolean {
     return Object.values(this.rivals).every(
       (rival) => rival.ships !== undefined,
@@ -63,13 +67,15 @@ export class Game {
   }
 
   getGameStartData(): GameStart[] {
-    return Object.values(this.rivals).map(({ ships = [], playerName }) => {
-      const data: GameStart = {
-        ships,
-        currentPlayerIndex: playerName,
-      };
-      return data;
-    });
+    return Object.values(this.rivals)
+      .filter((entry) => entry.playerName !== BOT_ID)
+      .map(({ ships = [], playerName }) => {
+        const data: GameStart = {
+          ships,
+          currentPlayerIndex: playerName,
+        };
+        return data;
+      });
   }
 
   checkGameOn(): boolean {
@@ -88,6 +94,10 @@ export class Game {
     return attackerId === currentTurnRival;
   }
 
+  checkGameWithBot(): boolean {
+    return this.getRivals().includes(BOT_ID);
+  }
+
   private getCurrentTurnRival(): RivalIndex {
     const idxRivalTurn = this.isFirstRivalInAttack ? 0 : 1;
     const rivals = this.getRivals();
@@ -99,10 +109,11 @@ export class Game {
       this.state = 'on';
     }
 
-    if (this.checkGameOn()) {
+    const rivals = this.getRivals().filter((rival) => rival !== BOT_ID);
+
+    if (this.checkGameOn() && rivals.length > 1) {
       this.isFirstRivalInAttack = !this.isFirstRivalInAttack;
     }
-    const rivals = this.getRivals();
 
     const outputs: GameOutput<GameTurn>[] = rivals.map((rival) => {
       return {
@@ -141,20 +152,29 @@ export class Game {
         currentPlayer: attackerId,
       };
 
-      const feedbackToAttacker: GameOutput<AttackFeedback> = {
-        output: { ...feedback },
-        toRivalId: attackerId,
-      };
-      feedbacks.push(feedbackToAttacker);
+      if (attackerId !== BOT_ID) {
+        const feedbackToAttacker: GameOutput<AttackFeedback> = {
+          output: { ...feedback },
+          toRivalId: attackerId,
+        };
+        feedbacks.push(feedbackToAttacker);
+      }
 
-      const feedbackToVictim: GameOutput<AttackFeedback> = {
-        output: { ...feedback },
-        toRivalId: victimId,
-      };
-      feedbacks.push(feedbackToVictim);
+      if (victimId !== BOT_ID) {
+        const feedbackToVictim: GameOutput<AttackFeedback> = {
+          output: { ...feedback },
+          toRivalId: victimId,
+        };
+        feedbacks.push(feedbackToVictim);
+      }
     });
 
     return feedbacks;
+  }
+
+  attackByBot(): GameOutput<AttackFeedback>[] | undefined {
+    const position = this.getRandomPositionForAttack(BOT_ID);
+    return this.attack(BOT_ID, position);
   }
 
   private end(winnerId: RivalIndex): void {
@@ -189,7 +209,20 @@ export class Game {
     return position;
   }
 
-  forceFinish(winnerId: RivalIndex): void{
+  forceFinish(winnerId: RivalIndex): void {
     this.end(winnerId);
-  };
+  }
 }
+
+const BOT_SHIPS: Ship[] = [
+  { position: { x: 4, y: 5 }, direction: false, type: 'huge', length: 4 },
+  { position: { x: 6, y: 7 }, direction: false, type: 'large', length: 3 },
+  { position: { x: 1, y: 0 }, direction: true, type: 'large', length: 3 },
+  { position: { x: 9, y: 3 }, direction: true, type: 'medium', length: 2 },
+  { position: { x: 0, y: 5 }, direction: false, type: 'medium', length: 2 },
+  { position: { x: 2, y: 7 }, direction: true, type: 'medium', length: 2 },
+  { position: { x: 8, y: 0 }, direction: true, type: 'small', length: 1 },
+  { position: { x: 0, y: 8 }, direction: false, type: 'small', length: 1 },
+  { position: { x: 5, y: 1 }, direction: false, type: 'small', length: 1 },
+  { position: { x: 8, y: 9 }, direction: true, type: 'small', length: 1 },
+];

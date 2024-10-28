@@ -14,6 +14,7 @@ import {
   addUserToRoom,
   attack,
   createRoom,
+  createSinglePlay,
   loginOrCreatePlayer,
   updateRoomState,
   updateWinners,
@@ -149,6 +150,14 @@ export const handleDialog = (
           responses.push(response);
         }
       });
+
+      break;
+    }
+
+    case Signals.SINGLE_PLAY: {
+      responses.pop();
+      const response = createSinglePlay(request as Command<string>, client);
+      responses.push(response);
 
       break;
     }

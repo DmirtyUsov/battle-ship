@@ -3,16 +3,13 @@ import { Game } from '../game.js';
 import { Answer, GameStart, Signals } from '../models/index.js';
 
 export const startGame = (game: Game): Answer[] => {
-  const [rival1Data, rival2Data] = game.getGameStartData();
+  const data = game.getGameStartData();
+  const responses = data.map((item) => makeResponseForRival(item));
 
-  const rival1Response = makeResponseForRival(rival1Data);
-  const rival2Response = makeResponseForRival(rival2Data);
-
-  return [rival1Response, rival2Response];
+  return responses;
 };
 
 const makeResponseForRival = (data: GameStart): Answer => {
-
   const client = playersDB.getClient(data.currentPlayerIndex as string);
 
   const response: Answer = {

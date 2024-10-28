@@ -10,3 +10,4 @@ export * from './attack.controller.js';
 export * from './turn.controller.js';
 export * from './finish.controller.js';
 export * from './update-winners.controller.js';
+export * from './create-single-play.controller.js';

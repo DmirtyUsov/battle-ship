@@ -79,6 +79,25 @@ export const attack = (
     responses.push(response);
   });
 
+  if (game.checkGameOn() && game.checkGameWithBot()) {
+    const botFeedbacks = game.attackByBot();
+    if (botFeedbacks) {
+      botFeedbacks.forEach((feedback) => {
+        const command = {
+          ...baseResponse.command,
+          data: feedback.output,
+        };
+        const client = playersDB.getClient(feedback.toRivalId as string);
+
+        const response: Answer = {
+          command,
+          client,
+        };
+        responses.push(response);
+      });
+    }
+  }
+
   const isGameOver = game.checkGameOver();
 
   const nextMoves = isGameOver ? finish(gameId) : turn(game);

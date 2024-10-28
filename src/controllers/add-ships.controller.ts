@@ -45,11 +45,8 @@ export const addShips = (
   }
 
   if (game.checkFleetReadiness()) {
-    const [response1Viral, response2Viral] = startGame(game);
     responses.pop();
-    responses.push(response1Viral);
-    responses.push(response2Viral);
-
+    startGame(game).forEach((response) => responses.push(response));
     turn(game).forEach((response) => responses.push(response));
   }
 

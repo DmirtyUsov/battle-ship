@@ -37,7 +37,7 @@ export const finish = (
   });
 
   if (game.checkGameOver()) {
-    if (!isForceToFinish) {
+    if (!isForceToFinish && !game.checkGameWithBot()) {
       winnersDB.addWin(game.getWinner());
     }
     const rivals = game.getRivals();
