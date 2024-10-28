@@ -14,13 +14,14 @@ import { turn } from './turn.controller.js';
 export const attack = (
   command: Command<AttackParams>,
   client: WebSocketExt,
+  isRandom: boolean = false,
 ): Answer[] => {
   const controllerSignal = Signals.ATTACK;
 
   const { baseResponse, isCommandValid } = makeBaseAnswerCheckCmdPlayerValidity(
     command,
     client,
-    controllerSignal,
+    isRandom ? Signals.RANDOM_ATTACK : controllerSignal,
   );
   const responses = [baseResponse];
 
@@ -41,12 +42,12 @@ export const attack = (
     return responses;
   }
 
-  const position: Position = { x, y };
-
   if (!game.checkTurn(indexPlayer)) {
     baseResponse.command.data = `It is not ${indexPlayer} turn.`;
     return responses;
   }
+
+  const position: Position = isRandom ? game.getRandomPosition() : { x, y };
 
   const feedbacks: AttackFeedback[] | undefined = game.attack(
     indexPlayer,

@@ -33,6 +33,13 @@ export class Board {
     return { x, y };
   }
 
+  static getRandomPosition(gridSize: number): Position {
+    const min = 0;
+    const max = gridSize;
+    const idx = Math.floor(Math.random() * (max - min) + min);
+    return Board.convertIndex2Position(idx, gridSize);
+  }
+
   private parseShips(ships: Ship[]): void {
     ships.forEach((ship) => this.convertShip2Indexes(ship));
   }

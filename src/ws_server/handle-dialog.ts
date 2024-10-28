@@ -133,6 +133,23 @@ export const handleDialog = (
       break;
     }
 
+    case Signals.RANDOM_ATTACK: {
+      responses.pop();
+
+      const responsesForRivals = attack(
+        request as Command<AttackParams>,
+        client,
+        true
+      );
+      responsesForRivals.forEach((response) => {
+        if (response.command.type !== Signals.VOID) {
+          responses.push(response);
+        }
+      });
+
+      break;
+    }
+
     default: {
       responseBad.command.data = 'Unknown command';
       break;

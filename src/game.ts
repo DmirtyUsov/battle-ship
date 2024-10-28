@@ -119,4 +119,8 @@ export class Game {
 
     return feedbacks;
   }
+
+  getRandomPosition(): Position {
+    return Board.getRandomPosition(GRID_SIZE);
+  }
 }
