@@ -2,6 +2,8 @@ import { Board } from './board.js';
 import { GRID_SIZE } from './config.js';
 import {
   AttackFeedback,
+  GameFinish,
+  GameOutput,
   GameRival,
   GameStart,
   GameTurn,
@@ -18,9 +20,12 @@ export class Game {
   private rivals: GameRivals = {};
   private state: State = 'setup';
   private isFirstRivalInAttack = false;
+  private winnerId: RivalIndex | undefined;
+  private gameForRoomId: number | undefined;
 
   constructor(room: Room) {
     const [rival1, rival2] = room.players;
+    this.gameForRoomId = room.id;
     this.rivals[rival1] = { playerName: rival1 };
     this.rivals[rival2] = { playerName: rival2 };
   }
@@ -32,6 +37,10 @@ export class Game {
   getRival(attackerId: RivalIndex): RivalIndex {
     const rivals = this.getRivals();
     return rivals.filter((rival) => rival !== attackerId)[0];
+  }
+
+  getRoomId(): number | undefined {
+    return this.gameForRoomId;
   }
 
   checkRival(name: RivalIndex): boolean {
@@ -67,6 +76,10 @@ export class Game {
     return this.state === 'on';
   }
 
+  checkGameOver(): boolean {
+    return this.state === 'over';
+  }
+
   checkTurn(attackerId: RivalIndex): boolean {
     if (!this.checkGameOn()) {
       return false;
@@ -81,43 +94,87 @@ export class Game {
     return rivals[idxRivalTurn];
   }
 
-  turn(): GameTurn {
+  turn(): GameOutput<GameTurn>[] {
     if (this.state === 'setup') {
       this.state = 'on';
     }
 
-    this.isFirstRivalInAttack = !this.isFirstRivalInAttack;
+    if (this.checkGameOn()) {
+      this.isFirstRivalInAttack = !this.isFirstRivalInAttack;
+    }
+    const rivals = this.getRivals();
 
-    return {
-      currentPlayer: this.getCurrentTurnRival(),
-    };
+    const outputs: GameOutput<GameTurn>[] = rivals.map((rival) => {
+      return {
+        output: {
+          currentPlayer: this.getCurrentTurnRival(),
+        },
+        toRivalId: rival,
+      };
+    });
+
+    return outputs;
   }
 
   attack(
     attackerId: RivalIndex,
     position: Position,
-  ): AttackFeedback[] | undefined {
+  ): GameOutput<AttackFeedback>[] | undefined {
     const victimId = this.getRival(attackerId);
 
     const victimBoard = this.rivals[victimId].board;
 
-    if (!victimBoard) {
+    if (!this.checkGameOn() || !victimBoard) {
       return undefined;
     }
 
     const boardFeedbacks = victimBoard.attack(position);
+    if (victimBoard.checkNoShipsOnBoard()) {
+      this.end(attackerId);
+    }
 
-    const feedbacks: AttackFeedback[] = [];
+    const feedbacks: GameOutput<AttackFeedback>[] = [];
 
     boardFeedbacks.forEach((entry) => {
       const feedback: AttackFeedback = {
         ...entry,
         currentPlayer: attackerId,
       };
-      feedbacks.push(feedback);
+
+      const feedbackToAttacker: GameOutput<AttackFeedback> = {
+        output: { ...feedback },
+        toRivalId: attackerId,
+      };
+      feedbacks.push(feedbackToAttacker);
+
+      const feedbackToVictim: GameOutput<AttackFeedback> = {
+        output: { ...feedback },
+        toRivalId: victimId,
+      };
+      feedbacks.push(feedbackToVictim);
     });
 
     return feedbacks;
+  }
+
+  private end(winnerId: RivalIndex): void {
+    this.state = 'over';
+    this.winnerId = winnerId;
+  }
+
+  getFinishData(): GameOutput<GameFinish>[] {
+    const rivals = this.checkGameOver() ? this.getRivals() : [];
+
+    const outputs: GameOutput<GameFinish>[] = rivals.map((rival) => {
+      return {
+        output: {
+          winPlayer: this.winnerId as string,
+        },
+        toRivalId: rival,
+      };
+    });
+
+    return outputs;
   }
 
   getRandomPosition(): Position {

@@ -4,12 +4,13 @@ import {
   AttackFeedback,
   AttackParams,
   Command,
+  GameOutput,
   Position,
   Signals,
   WebSocketExt,
 } from '../models/index.js';
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
-import { turn } from './turn.controller.js';
+import { finish, turn } from './index.js';
 
 export const attack = (
   command: Command<AttackParams>,
@@ -49,40 +50,35 @@ export const attack = (
 
   const position: Position = isRandom ? game.getRandomPosition() : { x, y };
 
-  const feedbacks: AttackFeedback[] | undefined = game.attack(
+  const feedbacks: GameOutput<AttackFeedback>[] | undefined = game.attack(
     indexPlayer,
     position,
   );
 
   if (!feedbacks) {
+    baseResponse.command.data = `No feedbacks from game.attack()`;
     return responses;
   }
 
   responses.pop();
   baseResponse.command.type = controllerSignal;
-  const victimClient = playersDB.getClient(
-    game.getRival(indexPlayer) as string,
-  );
 
   feedbacks.forEach((feedback) => {
-    const commandToAttacker = {
+    const command = {
       ...baseResponse.command,
-      data: { ...feedback },
+      data: feedback.output,
     };
-    const commandToVictim = {
-      ...baseResponse.command,
-      data: { ...feedback },
+    const client = playersDB.getClient(feedback.toRivalId as string);
+
+    const response: Answer = {
+      command,
+      client,
     };
-    const responseToVictim: Answer = {
-      command: commandToVictim,
-      client: victimClient,
-    };
-    const responseToAttacker: Answer = { command: commandToAttacker, client };
-    responses.push(responseToAttacker);
-    responses.push(responseToVictim);
+    responses.push(response);
   });
 
-  turn(game).forEach((response) => responses.push(response));
+  const nextMoves = game.checkGameOver() ? finish(game, gameId) : turn(game);
+  nextMoves.forEach((response) => responses.push(response));
 
   return responses;
 };

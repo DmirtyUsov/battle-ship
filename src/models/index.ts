@@ -19,3 +19,5 @@ export * from './ship-size.model.js';
 export * from './attack-status.model.js';
 export * from './attack-feedback.model.js';
 export * from './attack-params.model.js';
+export * from './game-finish.model.js';
+export * from './game-output.model.js';

@@ -11,9 +11,10 @@ type IndexWithAttackStatus = { index: number; status: AttackStatus };
 
 export class Board {
   private indexesWithShipParts = new Map<number, ShipPartsOnBoardHit>();
+  private tempAttacksBeforeFinish: number = 3;
 
   constructor(ships: Ship[], private gridSize: number) {
-    this.parseShips(ships);
+    this.placeShips(ships);
   }
 
   private static convertPosition2Index(
@@ -40,16 +41,17 @@ export class Board {
     return Board.convertIndex2Position(idx, gridSize);
   }
 
-  private parseShips(ships: Ship[]): void {
-    ships.forEach((ship) => this.convertShip2Indexes(ship));
+  private placeShips(ships: Ship[]): void {
+    ships.forEach((ship) => this.placeShipOnBoard(ship));
   }
 
-  private convertShip2Indexes(ship: Ship) {
+  private placeShipOnBoard(ship: Ship) {
     const { position, length, direction: isVertical } = ship;
     const shipLengthIndexes = [...Array(length).keys()];
     const startIndex = Board.convertPosition2Index(position, this.gridSize);
 
-    const cellAmend = isVertical ? this.gridSize : 0;
+    const cellAmend = isVertical ? this.gridSize : 1;
+
     const shipOnBoard: ShipPartsOnBoardHit = {};
     const shipCells: number[] = [];
 
@@ -64,9 +66,10 @@ export class Board {
     });
   }
 
-  private hit(index: number): IndexWithAttackStatus[] {
+  private hitCell(index: number): IndexWithAttackStatus[] {
     let status: AttackStatus;
     const shipPartsHit = this.indexesWithShipParts.get(index);
+    this.tempAttacksBeforeFinish--;
 
     if (!shipPartsHit) {
       status = 'miss';
@@ -101,7 +104,7 @@ export class Board {
   attack(position: Position): AttackFeedbackButPlayer[] {
     const index = Board.convertPosition2Index(position, this.gridSize);
 
-    const attackScores = this.hit(index);
+    const attackScores = this.hitCell(index);
 
     const feedbacks = attackScores.map(({ index, status }) => {
       const position = Board.convertIndex2Position(index, this.gridSize);
@@ -109,5 +112,11 @@ export class Board {
     });
 
     return feedbacks;
+  }
+
+  checkNoShipsOnBoard(): boolean {
+    return (
+      this.indexesWithShipParts.size === 0 || this.tempAttacksBeforeFinish === 0
+    );
   }
 }

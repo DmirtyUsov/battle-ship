@@ -8,8 +8,7 @@ import {
 } from '../models/index.js';
 
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
-import { startGame } from './start-game.controller.js';
-import { turn } from './turn.controller.js';
+import { startGame, turn } from './index.js';
 
 export const addShips = (
   command: Command<ShipsAdd>,

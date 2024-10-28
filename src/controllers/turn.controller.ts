@@ -6,16 +6,15 @@ export const turn = (game: Game): Answer[] => {
   const controllerSignal = Signals.TURN;
   const responses: Answer[] = [];
 
-  const data = game.turn();
-  const rivals = game.getRivals();
+  const outputs = game.turn();
 
-  rivals.forEach((rival) => {
-    const client = playersDB.getClient(rival as string);
+  outputs.forEach((item) => {
+    const client = playersDB.getClient(item.toRivalId as string);
 
     const response: Answer = {
       command: {
         type: client ? controllerSignal : Signals.NOT_GET_IT,
-        data: data ? data : `from ${controllerSignal} to player ${rival}`,
+        data: item.output,
         id: 0,
       },
       client,
