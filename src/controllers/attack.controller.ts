@@ -10,7 +10,7 @@ import {
   WebSocketExt,
 } from '../models/index.js';
 import { makeBaseAnswerCheckCmdPlayerValidity } from './controller-guard.js';
-import { finish, turn } from './index.js';
+import { finish, turn, updateWinners } from './index.js';
 
 export const attack = (
   command: Command<AttackParams>,
@@ -77,8 +77,14 @@ export const attack = (
     responses.push(response);
   });
 
-  const nextMoves = game.checkGameOver() ? finish(game, gameId) : turn(game);
+  const isGameOver = game.checkGameOver();
+
+  const nextMoves = isGameOver ? finish(game, gameId) : turn(game);
   nextMoves.forEach((response) => responses.push(response));
+
+  if (isGameOver) {
+    responses.push(updateWinners(client));
+  }
 
   return responses;
 };

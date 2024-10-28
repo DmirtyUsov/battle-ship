@@ -16,6 +16,7 @@ import {
   createRoom,
   loginOrCreatePlayer,
   updateRoomState,
+  updateWinners,
 } from '../controllers/index.js';
 
 export const handleDialog = (
@@ -67,6 +68,8 @@ export const handleDialog = (
       responses.push(response);
       const broadcast = updateRoomState(client);
       responses.push(broadcast);
+      const broadcast2 = updateWinners(client);
+      responses.push(broadcast2);
       break;
     }
 
@@ -77,8 +80,8 @@ export const handleDialog = (
       if (response.command.type !== Signals.VOID) {
         responses.push(response);
       } else {
-        const broadcast = updateRoomState(client);
-        responses.push(broadcast);
+        const broadcast1 = updateRoomState(client);
+        responses.push(broadcast1);
       }
 
       break;
@@ -139,7 +142,7 @@ export const handleDialog = (
       const responsesForRivals = attack(
         request as Command<AttackParams>,
         client,
-        true
+        true,
       );
       responsesForRivals.forEach((response) => {
         if (response.command.type !== Signals.VOID) {

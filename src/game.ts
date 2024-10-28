@@ -162,13 +162,17 @@ export class Game {
     this.winnerId = winnerId;
   }
 
+  getWinner(): string {
+    return this.winnerId as string;
+  }
+
   getFinishData(): GameOutput<GameFinish>[] {
     const rivals = this.checkGameOver() ? this.getRivals() : [];
 
     const outputs: GameOutput<GameFinish>[] = rivals.map((rival) => {
       return {
         output: {
-          winPlayer: this.winnerId as string,
+          winPlayer: this.getWinner(),
         },
         toRivalId: rival,
       };

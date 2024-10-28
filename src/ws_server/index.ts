@@ -3,9 +3,9 @@ import { WS_PORT } from '../config.js';
 import * as logger from '../logger.js';
 import { handleDialog } from './handle-dialog.js';
 import { Answer, Signals, WebSocketExt } from '../models/index.js';
-import { unlinkPlayer } from '../controllers/unlink-player.controller.js';
+import { unlinkPlayer } from '../controllers/index.js';
 
-export const wsServer = new WebSocketServer({ port: +WS_PORT });
+export const wsServer = new WebSocketServer({ port: WS_PORT });
 
 let nextClientId = 1;
 
@@ -38,7 +38,7 @@ wsServer.on('connection', (client: WebSocketExt) => {
 
 wsServer.on('close', () => console.log(`Server close`, wsServer.clients.size));
 
-const commandsToAll = [Signals.UPDATE_ROOM];
+const commandsToAll = [Signals.UPDATE_ROOM, Signals.UPDATE_WINNERS];
 
 const sendAnswers = (responses: Answer[]): void => {
   responses.forEach((response) => {
