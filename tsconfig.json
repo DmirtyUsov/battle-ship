@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "Node16",
+    "allowJs": true,
+    "checkJs": true,
+    "maxNodeModuleJsDepth": 1, 
+    "sourceMap": true, 
+    "outDir": "./dist",
+    "esModuleInterop": true, 
+    "forceConsistentCasingInFileNames": true, 
+    "strict": true, 
+    "noImplicitAny": true, 
+    "skipLibCheck": true 
+  }
+}
