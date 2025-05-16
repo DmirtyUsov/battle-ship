@@ -15,12 +15,12 @@ wsServer.on('connection', (client:WebSocketClient) => {
     id: 0,
     data: 'Connected',
   };
-  const message: Message = { command, client, direction: 'from' };
+  const message: Message = { command, client, direction: 'in' };
   handleDialog(message);
 
   client.on('message', (rawData: RawData) => {
     const command = parseRawData(rawData);
-    const message: Message = { command, client, direction: 'from' };
+    const message: Message = { command, client, direction: 'in' };
     handleDialog(message);
   });
 
@@ -32,7 +32,7 @@ wsServer.on('connection', (client:WebSocketClient) => {
       id: 0,
       data: 'Closed',
     };
-    const message: Message = { command, client, direction: 'from' };
+    const message: Message = { command, client, direction: 'in' };
     handleDialog(message);
   });
 });

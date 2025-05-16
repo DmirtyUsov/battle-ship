@@ -5,10 +5,6 @@ export abstract class MapDB<I, T> {
     return Array.from(this.db.values());
   }
 
-  // add(id: I, item: T): T {
-  //   return this.update(id, item);
-  // }
-
   get(id: I): T | undefined {
     return this.db.get(id);
   }

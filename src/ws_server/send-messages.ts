@@ -8,19 +8,18 @@ export const sendMessages = (toMessages: Message[]): void => {
       return;
     }
 
-    console.log(`Server --> ${client.id} Client `);
-
     if (command.type === CommandType.NOT_GET_IT) {
       console.error('Server Error:', message.command.data);
       return;
     }
+    
+    console.log(`Server --> ${client.id} Client `);
+    console.log(command);
 
     try {
       const data = JSON.stringify(command.data);
       command.data = data;
       const message = JSON.stringify(command);
-
-      console.log(message);
 
       client.send(message);
     } catch (error) {

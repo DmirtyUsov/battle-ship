@@ -1,2 +1,3 @@
 export * from './client.ctrl';
-export * from './validate-command.ctrl';
+export * from './parse-command.ctrl';
+export * from './player.ctrl';
