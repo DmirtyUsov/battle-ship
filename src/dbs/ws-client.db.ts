@@ -8,7 +8,6 @@ class WsClientDB extends MapDB<number, WebSocketClient> {
     item.id = this.nextClientId;
     const newItem = this.update(this.nextClientId, item);
     this.nextClientId += 1;
-    console.log('After add',newItem.id);
     return newItem;
   }
 }
