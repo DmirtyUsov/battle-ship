@@ -1,7 +1,7 @@
 import { RawData, WebSocketServer } from 'ws';
 import { WS_PORT } from '../config';
 import { handleDialog } from './handle-dialog';
-import { Command, CommandType, Message } from '../models';
+import { Command, CommandType, Message, WebSocketClient } from '../models';
 
 export const wsServer = new WebSocketServer({ port: WS_PORT });
 
@@ -9,7 +9,7 @@ wsServer.on('listening', () =>
   console.log(`WebSocketServer is running on port: ${WS_PORT}`)
 );
 
-wsServer.on('connection', (client) => {
+wsServer.on('connection', (client:WebSocketClient) => {
   const command: Command = {
     type: CommandType.ON_CONNECTION,
     id: 0,
