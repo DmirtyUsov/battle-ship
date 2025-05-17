@@ -6,3 +6,5 @@ export * from './player.model';
 export * from './login-dto.model';
 export * from './registration-dto.model';
 export * from './room.model';
+export * from './room-state.model';
+export * from './room-user.model';

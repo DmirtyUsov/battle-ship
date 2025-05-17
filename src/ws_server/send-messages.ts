@@ -13,7 +13,7 @@ export const sendMessages = (toMessages: Message[]): void => {
       return;
     }
     
-    console.log(`Server --> ${client.id} Client `);
+    console.log(`Server --> #${client.id} Client `);
     console.log(command);
 
     try {

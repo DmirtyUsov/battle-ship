@@ -1,4 +1,5 @@
 import { playerDB } from '../dbs/player.db';
+import { roomDB } from '../dbs/room.db';
 import {
   Command,
   CommandType,
@@ -8,6 +9,7 @@ import {
   WebSocketClient,
 } from '../models';
 import { makeCommand } from './make-command';
+import { updateRoomsToAllCtrl } from './room.ctrl';
 
 export const addPlayerCtrl = (inMessage: Message): Message => {
   const loginDTO = inMessage.command.data as LoginDTO;
@@ -73,7 +75,31 @@ const linkPlayerClient = (name: string, client: WebSocketClient): void => {
   client.linkedPlayerName = name;
 };
 
-export const unlinkPlayerClientCtrl = (name: string, client: WebSocketClient): void => {
-  playerDB.setClientId(name, undefined);
-  client.linkedPlayerName = undefined;
+export const unlinkPlayerClientCtrl = (inMessage: Message): Message[] => {
+  const command: Command = makeCommand();
+  const outMessage: Message = {
+    ...inMessage,
+    direction: 'out',
+    command,
+  };
+  const outMessages: Message[] = [];
+
+  const name = inMessage.client.linkedPlayerName;
+
+  if (name) {
+    playerDB.setClientId(name, undefined);
+    inMessage.client.linkedPlayerName = undefined;
+
+    const player = playerDB.get(name);
+    if (player) {
+      if (player.roomId) {
+        roomDB.delete(player.roomId);
+        playerDB.setRoomId(name, undefined);
+        const messages = updateRoomsToAllCtrl();
+        outMessages.push(...messages);
+      }
+    }
+  }
+  outMessages.push(outMessage);
+  return outMessages;
 };
