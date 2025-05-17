@@ -12,6 +12,13 @@ class PlayerDB extends MapDB<string, Player> {
     this.update(name, newPlayer);
     return newPlayer;
   }
+  setClientId(name: string, clientId: number | undefined): Player | undefined {
+    const player = this.get(name);
+    if (!player) {
+      return undefined;
+    }
+    return this.update(name, { ...player, clientId });
+  }
 }
 
 export const playerDB = new PlayerDB();

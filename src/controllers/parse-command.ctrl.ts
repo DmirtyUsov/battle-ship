@@ -1,8 +1,8 @@
 import { CommandType, Message } from '../models';
-import { makeVoidCommand } from './make-void-command';
+import { makeCommand } from './make-command';
 
 export const parseCommandCtrl = (fromMessage: Message): Message[] => {
-  const command1 = makeVoidCommand();
+  const command1 = makeCommand();
   const toMessage1: Message = {
     ...fromMessage,
     direction: 'out',
@@ -22,7 +22,7 @@ export const parseCommandCtrl = (fromMessage: Message): Message[] => {
     type !== CommandType.ON_CLOSE &&
     type !== CommandType.NOT_GET_IT;
 
-  const command2 = makeVoidCommand();
+  const command2 = makeCommand();
   const toMessage2: Message = {
     ...fromMessage,
     direction: 'out',

@@ -16,5 +16,6 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
   },
   tseslint.configs.recommended,
+  { ignores: ['front/'] },
   eslintConfigPrettier,
 ]);
