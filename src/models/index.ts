@@ -8,3 +8,4 @@ export * from './registration-dto.model';
 export * from './room.model';
 export * from './room-state.model';
 export * from './room-user.model';
+export * from './room-add-user-dto.model';

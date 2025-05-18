@@ -25,6 +25,25 @@ class RoomDB extends MapDB<number, Room> {
         return state;
       });
   }
+
+  addPlayer(roomId: number, name: string): Room | undefined {
+    if (!this.checkTwoPlayers(roomId)) {
+      const room = this.get(roomId);
+      if (room) {
+        room.players.push(name);
+        return this.update(roomId, room);
+      }
+    }
+    return undefined;
+  }
+
+  private checkTwoPlayers(roomId: number): boolean {
+    const room = this.get(roomId);
+    if (room) {
+      return room.players.length === 2;
+    }
+    return false;
+  }
 }
 
 export const roomDB = new RoomDB();

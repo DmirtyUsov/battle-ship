@@ -1,7 +1,13 @@
 import { playerDB } from '../dbs/player.db';
 import { roomDB } from '../dbs/room.db';
 import { wsClientDB } from '../dbs/ws-client.db';
-import { Command, CommandType, Message, WebSocketClient } from '../models';
+import {
+  Command,
+  CommandType,
+  Message,
+  RoomAddUserDTO,
+  WebSocketClient,
+} from '../models';
 import { makeCommand } from './make-command';
 
 export const createRoomCtrl = (inMessage: Message): Message => {
@@ -60,4 +66,34 @@ const updateRoom = (clients: WebSocketClient[]): Message[] => {
   });
 
   return outMessages;
+};
+
+export const addUserToRoomCtrl = (inMessage: Message): Message => {
+  const command: Command = makeCommand();
+  const outMessage: Message = {
+    ...inMessage,
+    direction: 'out',
+    command,
+  };
+
+  const playerName = inMessage.client.linkedPlayerName || '';
+  if (playerDB.checkHasRoom(playerName)) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Player ${playerName} already in the room.`;
+    return outMessage;
+  }
+
+  const { indexRoom } = inMessage.command.data as RoomAddUserDTO;
+  const roomId = indexRoom as number;
+
+  const room = roomDB.addPlayer(roomId, playerName);
+
+  if (!room) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Room ${indexRoom} is already full or does not exist`;
+    return outMessage;
+  }
+
+  playerDB.setRoomId(playerName, roomId);
+  return outMessage;
 };
