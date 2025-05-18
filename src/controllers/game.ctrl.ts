@@ -5,6 +5,7 @@ import { Game } from '../game';
 import {
   Command,
   CommandType,
+  GameAddShipsDTO,
   GameCreateDTO,
   Message,
   RoomAddUserDTO,
@@ -66,4 +67,33 @@ export const createGameCtrl = (inMessage: Message): Message[] => {
   });
 
   return outMessages;
+};
+
+export const addShipsCtrl = (inMessage: Message): Message => {
+  const command: Command = makeCommand();
+  const outMessage: Message = {
+    ...inMessage,
+    direction: 'out',
+    command: command,
+  };
+
+  const data = inMessage.command.data as GameAddShipsDTO;
+  const gameId = data.gameId as number;
+  const name = data.indexPlayer as string;
+
+  const game = Game.getGame(gameId);
+
+  if (!game) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Game with id ${gameId} does not exist`;
+    return outMessage;
+  }
+
+  if (!game.setPlayerShips(name, data.ships)) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Game id ${gameId} does not have an indexPlayer ${name}`;
+    return outMessage;
+  }
+
+  return outMessage;
 };

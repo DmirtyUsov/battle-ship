@@ -1,4 +1,5 @@
-import { Rival, Room } from './models';
+import { Board } from './board';
+import { Rival, Room, Ship } from './models';
 
 export class Game {
   private rivals: Record<string, Rival> = {};
@@ -29,5 +30,18 @@ export class Game {
 
   static getGame(gameId: number): Game | undefined {
     return Game.games[gameId];
+  }
+
+  checkPlayer(name: string): boolean {
+    return this.playersName.includes(name);
+  }
+
+  setPlayerShips(name: string, ships: Ship[]): boolean {
+    const result = this.checkPlayer(name);
+    if (result) {
+      this.rivals[name].ships = ships;
+      this.rivals[name].board = new Board(ships);
+    }
+    return result;
   }
 }

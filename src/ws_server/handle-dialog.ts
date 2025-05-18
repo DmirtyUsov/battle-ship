@@ -1,6 +1,7 @@
 import {
   addClientCtrl,
   addPlayerCtrl,
+  addShipsCtrl,
   addUserToRoomCtrl,
   createGameCtrl,
   createRoomCtrl,
@@ -70,6 +71,14 @@ export const handleDialog = (inMessage: Message): void => {
 
         const outMessagesCreateGame = createGameCtrl(inMessage);
         outMessages.push(...outMessagesCreateGame);
+      }
+      break;
+    }
+    case CommandType.ADD_SHIPS: {
+      const outMessageAddShips = addShipsCtrl(inMessage);
+      outMessages.push(outMessageAddShips);
+
+      if (outMessageAddShips.command.type !== CommandType.NOT_GET_IT) {
       }
       break;
     }
