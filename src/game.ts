@@ -1,5 +1,5 @@
 import { Board } from './board';
-import { Rival, Room, Ship } from './models';
+import { GameStartDTO, Rival, Room, Ship } from './models';
 
 export class Game {
   private rivals: Record<string, Rival> = {};
@@ -43,5 +43,21 @@ export class Game {
       this.rivals[name].board = new Board(ships);
     }
     return result;
+  }
+
+  checkShipsReadiness(): boolean {
+    return Object.values(this.rivals).every(
+      (rival) => rival.ships !== undefined
+    );
+  }
+
+  getGameStartData(): GameStartDTO[] {
+    return Object.values(this.rivals).map(({ ships = [], playerName }) => {
+      const data: GameStartDTO = {
+        ships,
+        currentPlayerIndex: playerName,
+      };
+      return data;
+    });
   }
 }

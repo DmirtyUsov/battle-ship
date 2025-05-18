@@ -7,6 +7,7 @@ import {
   createRoomCtrl,
   parseCommandCtrl,
   removeClientCtrl,
+  startGameCtrl,
   unlinkPlayerClientCtrl,
   updateRoomsCtrl,
   updateRoomsToAllCtrl,
@@ -79,6 +80,8 @@ export const handleDialog = (inMessage: Message): void => {
       outMessages.push(outMessageAddShips);
 
       if (outMessageAddShips.command.type !== CommandType.NOT_GET_IT) {
+        const outMessagesStartGame = startGameCtrl(inMessage);
+        outMessages.push(...outMessagesStartGame);
       }
       break;
     }

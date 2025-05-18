@@ -14,3 +14,4 @@ export * from './position.mode';
 export * from './ship.model';
 export * from './rival.model';
 export * from './game-add-ships-dto.model';
+export * from './game-start-dto.model'
