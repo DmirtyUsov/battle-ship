@@ -26,6 +26,13 @@ class PlayerDB extends MapDB<string, Player> {
     }
     return this.update(name, { ...player, roomId });
   }
+  setGameId(name: string, gameId: number | undefined): Player | undefined {
+    const player = this.get(name);
+    if (!player) {
+      return undefined;
+    }
+    return this.update(name, { ...player, gameId });
+  }
 
   checkHasRoom(name: string): boolean {
     const player = this.get(name);

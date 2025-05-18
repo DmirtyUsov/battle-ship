@@ -2,7 +2,7 @@ import { MapDB } from './map-db';
 import { WebSocketClient } from '../models';
 
 class WsClientDB extends MapDB<number, WebSocketClient> {
-  private nextClientId: number = 0;
+  private nextClientId: number = 1;
 
   add(item: WebSocketClient): WebSocketClient {
     item.id = this.nextClientId;

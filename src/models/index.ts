@@ -9,3 +9,7 @@ export * from './room.model';
 export * from './room-state.model';
 export * from './room-user.model';
 export * from './room-add-user-dto.model';
+export * from './game-create-dto';
+export * from './position.mode';
+export * from './ship.model';
+export * from './rival.model';

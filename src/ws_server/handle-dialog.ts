@@ -2,6 +2,7 @@ import {
   addClientCtrl,
   addPlayerCtrl,
   addUserToRoomCtrl,
+  createGameCtrl,
   createRoomCtrl,
   parseCommandCtrl,
   removeClientCtrl,
@@ -66,6 +67,9 @@ export const handleDialog = (inMessage: Message): void => {
       if (outMessageAdd.command.type !== CommandType.NOT_GET_IT) {
         const outMessagesUpdate = updateRoomsToAllCtrl();
         outMessages.push(...outMessagesUpdate);
+
+        const outMessagesCreateGame = createGameCtrl(inMessage);
+        outMessages.push(...outMessagesCreateGame);
       }
       break;
     }
