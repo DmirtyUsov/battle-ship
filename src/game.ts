@@ -1,10 +1,22 @@
 import { Board } from './board';
-import { GameStartDTO, Rival, Room, Ship } from './models';
+import {
+  GameResponse,
+  GameStartDTO,
+  GameTurnDTO,
+  Rival,
+  Room,
+  Ship,
+} from './models';
+
+type GameState = 'setup' | 'on' | 'over';
 
 export class Game {
   private rivals: Record<string, Rival> = {};
   private readonly roomId: number;
   private readonly gameId: number;
+  private state: GameState = 'setup';
+  private isFirstRivalTurn = true;
+
   private static nextGameId = 1;
   private static games: Record<number, Game> = {};
 
@@ -51,13 +63,40 @@ export class Game {
     );
   }
 
-  getGameStartData(): GameStartDTO[] {
+  start(): GameResponse<GameStartDTO>[] {
     return Object.values(this.rivals).map(({ ships = [], playerName }) => {
       const data: GameStartDTO = {
         ships,
         currentPlayerIndex: playerName,
       };
-      return data;
+      return { data, toPlayerName: playerName };
     });
+  }
+
+  private getCurrentTurnRival(): string {
+    const idxRivalTurn = this.isFirstRivalTurn ? 0 : 1;
+    return this.playersName[idxRivalTurn];
+  }
+
+  turn(): GameResponse<GameTurnDTO>[] {
+    if (this.state === 'setup') {
+      this.state = 'on';
+    }
+    this.isFirstRivalTurn = !this.isFirstRivalTurn;
+
+    const currentPlayer = this.getCurrentTurnRival();
+
+    const outputs: GameResponse<GameTurnDTO>[] = this.playersName.map(
+      (rival) => {
+        return {
+          data: {
+            currentPlayer,
+          },
+          toPlayerName: rival,
+        };
+      }
+    );
+
+    return outputs;
   }
 }

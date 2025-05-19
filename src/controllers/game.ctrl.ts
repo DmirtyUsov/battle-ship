@@ -6,12 +6,13 @@ import {
   Command,
   CommandType,
   GameAddShipsDTO,
+  GameAttackDTO,
   GameCreateDTO,
-  GameStartDTO,
   Message,
   RoomAddUserDTO,
 } from '../models';
 import { makeCommand } from './make-command';
+import { makeMessageFromResponse } from './make-message-from-response';
 
 export const createGameCtrl = (inMessage: Message): Message[] => {
   const command: Command = makeCommand(CommandType.CREATE_GAME);
@@ -122,36 +123,42 @@ export const startGameCtrl = (inMessage: Message): Message[] => {
     return [outMessage];
   }
   const outMessages: Message[] = game
-    .getGameStartData()
-    .map((data: GameStartDTO) => {
-      const command: Command = makeCommand(CommandType.START_GAME);
-      const outMessage: Message = {
-        ...inMessage,
-        direction: 'out',
-        command,
-      };
-      const name = data.currentPlayerIndex as string;
+    .start()
+    .map((response) =>
+      makeMessageFromResponse(CommandType.START_GAME, response)
+    );
 
-      const player = playerDB.get(name);
+  return outMessages;
+};
 
-      if (!player || !player.clientId) {
-        command.type = CommandType.NOT_GET_IT;
-        command.data = `Start Game. Can't find player`;
-        return outMessage;
-      }
+export const turnGameCtrl = (inMessage: Message): Message[] => {
+  const command: Command = makeCommand();
+  const outMessage: Message = {
+    ...inMessage,
+    direction: 'out',
+    command: command,
+  };
 
-      const client = wsClientDB.get(player.clientId);
-      if (!client) {
-        command.type = CommandType.NOT_GET_IT;
-        command.data = `Start Game. Can't find client`;
-        return outMessage;
-      }
+  const data =
+    inMessage.command.type === CommandType.ADD_SHIPS
+      ? (inMessage.command.data as GameAddShipsDTO)
+      : (inMessage.command.data as GameAttackDTO);
 
-      outMessage.client = client;
-      command.data = data;
+  const gameId = data.gameId as number;
 
-      return outMessage;
-    });
+  const game = Game.getGame(gameId);
+
+  if (!game) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Turn Game. Game with id ${gameId} does not exist`;
+    return [outMessage];
+  }
+  
+  const outMessages: Message[] = game
+    .turn()
+    .map((response) =>
+      makeMessageFromResponse(CommandType.TURN, response)
+    );
 
   return outMessages;
 };

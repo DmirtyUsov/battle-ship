@@ -9,9 +9,12 @@ export * from './room.model';
 export * from './room-state.model';
 export * from './room-user.model';
 export * from './room-add-user-dto.model';
-export * from './game-create-dto';
+export * from './game-create-dto.model';
 export * from './position.mode';
 export * from './ship.model';
 export * from './rival.model';
 export * from './game-add-ships-dto.model';
-export * from './game-start-dto.model'
+export * from './game-start-dto.model';
+export * from './game-attack-dto.model';
+export * from './game-response.model';
+export * from './game-turn-dto.model';
