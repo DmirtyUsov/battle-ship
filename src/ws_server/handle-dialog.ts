@@ -14,6 +14,7 @@ import {
   updateRoomsCtrl,
   updateRoomsToAllCtrl,
 } from '../controllers';
+import { createSinglePLayGameCtrl } from '../controllers/bot.ctrl';
 import { CommandType, Message } from '../models';
 import { sendMessages } from './send-messages';
 
@@ -106,6 +107,11 @@ export const handleDialog = (inMessage: Message): void => {
         outMessages.push(...outMessagesTurnGame);
       }
 
+      break;
+    }
+    case CommandType.SINGLE_PLAY: {
+      const outMessageCreate = createSinglePLayGameCtrl(inMessage);
+      outMessages.push(outMessageCreate);
       break;
     }
     default:

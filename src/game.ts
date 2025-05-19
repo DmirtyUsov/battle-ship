@@ -11,6 +11,8 @@ import {
   Ship,
 } from './models';
 
+export const BOT_ID = 'bot45SdWWe8';
+
 type GameState = 'setup' | 'on' | 'over';
 type PlayerIndex = string;
 
@@ -19,7 +21,7 @@ export class Game {
   private readonly roomId: number;
   private readonly gameId: number;
   private state: GameState = 'setup';
-  private isFirstRivalTurn = true;
+  private isFirstRivalTurn = false;
   private winnerId: PlayerIndex = '';
   private isLastAttackMiss = true;
 
@@ -63,20 +65,26 @@ export class Game {
     return result;
   }
 
-  checkShipsReadiness(): boolean {
+  private checkShipsReadiness(): boolean {
     return Object.values(this.rivals).every(
       (rival) => rival.ships !== undefined
     );
   }
 
-  start(): GameResponse<GameStartDTO>[] {
-    return Object.values(this.rivals).map(({ ships = [], playerName }) => {
-      const data: GameStartDTO = {
-        ships,
-        currentPlayerIndex: playerName,
-      };
-      return { data, toPlayerName: playerName };
-    });
+  start(): GameResponse<GameStartDTO | undefined>[] {
+    if (!this.checkShipsReadiness()) {
+      return [];
+    }
+
+    return Object.values(this.rivals)
+      .filter((entry) => entry.playerName !== BOT_ID)
+      .map(({ ships = [], playerName }) => {
+        const data: GameStartDTO = {
+          ships,
+          currentPlayerIndex: playerName,
+        };
+        return { data, toPlayerName: playerName };
+      });
   }
 
   private getCurrentTurnRival(): string {
@@ -93,17 +101,18 @@ export class Game {
     }
 
     const currentPlayer = this.getCurrentTurnRival();
+    
 
-    const outputs: GameResponse<GameTurnDTO>[] = this.playersName.map(
-      (rival) => {
+    const outputs: GameResponse<GameTurnDTO>[] = this.playersName
+      .filter((rival) => rival !== BOT_ID)
+      .map((rival) => {
         return {
           data: {
             currentPlayer,
           },
           toPlayerName: rival,
         };
-      }
-    );
+      });
 
     return outputs;
   }
@@ -152,17 +161,20 @@ export class Game {
         currentPlayer: attackerId,
       };
 
-      const responseToAttacker: GameResponse<AttackFeedbackDTO> = {
-        data: { ...feedback },
-        toPlayerName: attackerId,
-      };
-      responses.push(responseToAttacker);
-
-      const responseToVictim: GameResponse<AttackFeedbackDTO> = {
-        data: { ...feedback },
-        toPlayerName: victimId,
-      };
-      responses.push(responseToVictim);
+      if (attackerId !== BOT_ID) {
+        const responseToAttacker: GameResponse<AttackFeedbackDTO> = {
+          data: { ...feedback },
+          toPlayerName: attackerId,
+        };
+        responses.push(responseToAttacker);
+      }
+      if (victimId !== BOT_ID) {
+        const responseToVictim: GameResponse<AttackFeedbackDTO> = {
+          data: { ...feedback },
+          toPlayerName: victimId,
+        };
+        responses.push(responseToVictim);
+      }
     });
     this.isLastAttackMiss = responses[0].data.status === 'miss';
     return responses;
@@ -182,4 +194,21 @@ export class Game {
       : { x: 0, y: 0 };
     return position;
   }
+
+  setBotShips(): boolean {
+    return this.setPlayerShips(BOT_ID, BOT_SHIPS);
+  }
 }
+
+const BOT_SHIPS: Ship[] = [
+  { position: { x: 4, y: 5 }, direction: false, type: 'huge', length: 4 },
+  { position: { x: 6, y: 7 }, direction: false, type: 'large', length: 3 },
+  { position: { x: 1, y: 0 }, direction: true, type: 'large', length: 3 },
+  { position: { x: 9, y: 3 }, direction: true, type: 'medium', length: 2 },
+  { position: { x: 0, y: 5 }, direction: false, type: 'medium', length: 2 },
+  { position: { x: 2, y: 7 }, direction: true, type: 'medium', length: 2 },
+  { position: { x: 8, y: 0 }, direction: true, type: 'small', length: 1 },
+  { position: { x: 0, y: 8 }, direction: false, type: 'small', length: 1 },
+  { position: { x: 5, y: 1 }, direction: false, type: 'small', length: 1 },
+  { position: { x: 8, y: 9 }, direction: true, type: 'small', length: 1 },
+];

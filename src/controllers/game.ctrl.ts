@@ -119,9 +119,6 @@ export const startGameCtrl = (inMessage: Message): Message[] => {
     return [outMessage];
   }
 
-  if (!game.checkShipsReadiness()) {
-    return [outMessage];
-  }
   const outMessages: Message[] = game
     .start()
     .map((response) =>
