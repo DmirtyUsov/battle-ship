@@ -14,7 +14,7 @@ import {
   updateRoomsCtrl,
   updateRoomsToAllCtrl,
 } from '../controllers';
-import { AttackFeedbackDTO, CommandType, Message } from '../models';
+import { CommandType, Message } from '../models';
 import { sendMessages } from './send-messages';
 
 export const handleDialog = (inMessage: Message): void => {
@@ -94,17 +94,18 @@ export const handleDialog = (inMessage: Message): void => {
       }
       break;
     }
+    case CommandType.RANDOM_ATTACK:
     case CommandType.ATTACK: {
       const outMessageAttack = attackGameCtrl(inMessage);
       outMessages.push(...outMessageAttack);
 
       const { length, [length - 1]: lastOutMessage } = outMessages;
-      const data = lastOutMessage.command.data as AttackFeedbackDTO;
 
-      if (data.status === 'miss') {
+      if (lastOutMessage.command.type === CommandType.ATTACK) {
         const outMessagesTurnGame = turnGameCtrl(inMessage);
         outMessages.push(...outMessagesTurnGame);
       }
+
       break;
     }
     default:

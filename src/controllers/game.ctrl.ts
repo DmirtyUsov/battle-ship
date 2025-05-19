@@ -168,6 +168,7 @@ export const attackGameCtrl = (inMessage: Message): Message[] => {
     direction: 'out',
     command: command,
   };
+
   const data = inMessage.command.data as GameAttackDTO;
   const gameId = data.gameId as number;
 
@@ -178,7 +179,14 @@ export const attackGameCtrl = (inMessage: Message): Message[] => {
     command.data = `Attack. Game with id ${gameId} does not exist`;
     return [outMessage];
   }
-  
+
+  if (inMessage.command.type === CommandType.RANDOM_ATTACK) {
+    const attackerId = data.indexPlayer as string;
+    const { x, y } = game.getRandomPositionForAttack(attackerId);
+    data.x = x;
+    data.y = y;
+  }
+
   const outMessages: Message[] = game
     .attack(data)
     .map((response) => makeMessageFromResponse(CommandType.ATTACK, response));

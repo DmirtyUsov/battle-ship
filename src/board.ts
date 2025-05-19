@@ -7,6 +7,7 @@ type HitCellResult = { index: number; status: AttackStatus };
 export class Board {
   private indexesWithShipParts = new Map<number, ShipPartsOnBoardStatus>();
   private countShipsRemain = 0;
+  private randomCellsForAttacks: number[];
 
   constructor(
     ships: Ship[],
@@ -14,6 +15,7 @@ export class Board {
   ) {
     this.placeShips(ships);
     this.countShipsRemain = ships.length;
+    this.randomCellsForAttacks = Board.makeRandomCells(gridSize);
   }
 
   placeShips(ships: Ship[]): void {
@@ -56,6 +58,17 @@ export class Board {
     const x = idx % gridSize;
     const y = (idx - x) / gridSize;
     return { x, y };
+  }
+
+  private static makeRandomCells(gridSize: number): number[] {
+    const cells = [...Array(gridSize ** 2).keys()];
+    cells.sort(() => Math.random() - 0.5);
+    return cells;
+  }
+
+  getRandomPosition(): Position {
+    const idx = this.randomCellsForAttacks.pop();
+    return Board.convertIndex2Position(idx || 0, this.gridSize);
   }
 
   private hitCell(index: number): HitCellResult[] {

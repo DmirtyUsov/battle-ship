@@ -21,6 +21,7 @@ export class Game {
   private state: GameState = 'setup';
   private isFirstRivalTurn = true;
   private winnerId: PlayerIndex = '';
+  private isLastAttackMiss = true;
 
   private static nextGameId = 1;
   private static games: Record<number, Game> = {};
@@ -87,7 +88,9 @@ export class Game {
     if (this.state === 'setup') {
       this.state = 'on';
     }
-    this.isFirstRivalTurn = !this.isFirstRivalTurn;
+    if (this.isLastAttackMiss) {
+      this.isFirstRivalTurn = !this.isFirstRivalTurn;
+    }
 
     const currentPlayer = this.getCurrentTurnRival();
 
@@ -119,6 +122,14 @@ export class Game {
     const victimId = this.getRival(attackerId);
 
     const victimBoard = this.rivals[victimId].board;
+
+    if (attackerId !== this.getCurrentTurnRival()) {
+      const response: GameResponse<undefined> = {
+        toPlayerName: attackerId,
+        data: undefined,
+      };
+      return [response];
+    }
 
     if (!victimBoard) {
       const response: GameResponse<undefined> = {
@@ -153,12 +164,22 @@ export class Game {
       };
       responses.push(responseToVictim);
     });
-
+    this.isLastAttackMiss = responses[0].data.status === 'miss';
     return responses;
   }
 
   private end(winnerId: PlayerIndex): void {
     this.state = 'over';
     this.winnerId = winnerId;
+  }
+
+  getRandomPositionForAttack(attackerId: PlayerIndex): Position {
+    const victimId = this.getRival(attackerId);
+
+    const victimBoard = this.rivals[victimId].board;
+    const position = victimBoard
+      ? victimBoard.getRandomPosition()
+      : { x: 0, y: 0 };
+    return position;
   }
 }
