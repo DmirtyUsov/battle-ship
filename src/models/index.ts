@@ -21,3 +21,4 @@ export * from './game-turn-dto.model';
 export * from './game-attack-status.model';
 export * from './game-attack-feedback-dto.model';
 export * from './game-attack-random-dto.model';
+export * from './game-finish-dto.model';

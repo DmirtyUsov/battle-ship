@@ -188,5 +188,11 @@ export const attackGameCtrl = (inMessage: Message): Message[] => {
     .attack(data)
     .map((response) => makeMessageFromResponse(CommandType.ATTACK, response));
 
+  if (game.checkGameOver()) {
+    const outFinishMessages = game
+      .finish()
+      .map((response) => makeMessageFromResponse(CommandType.FINISH, response));
+    outMessages.push(...outFinishMessages);
+  }
   return outMessages;
 };

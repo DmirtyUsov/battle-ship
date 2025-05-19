@@ -2,6 +2,7 @@ import { Board } from './board';
 import {
   AttackFeedbackDTO,
   GameAttackDTO,
+  GameFinishDTO,
   GameResponse,
   GameStartDTO,
   GameTurnDTO,
@@ -70,6 +71,9 @@ export class Game {
       (rival) => rival.ships !== undefined
     );
   }
+  checkGameOver(): boolean {
+    return this.state === 'over';
+  }
 
   start(): GameResponse<GameStartDTO | undefined>[] {
     if (!this.checkShipsReadiness()) {
@@ -101,7 +105,6 @@ export class Game {
     }
 
     const currentPlayer = this.getCurrentTurnRival();
-    
 
     const outputs: GameResponse<GameTurnDTO>[] = this.playersName
       .filter((rival) => rival !== BOT_ID)
@@ -197,6 +200,21 @@ export class Game {
 
   setBotShips(): boolean {
     return this.setPlayerShips(BOT_ID, BOT_SHIPS);
+  }
+
+  finish(): GameResponse<GameFinishDTO>[] {
+    const rivals = this.checkGameOver() ? this.playersName : [];
+
+    const responses: GameResponse<GameFinishDTO>[] = rivals.map((rival) => {
+      return {
+        data: {
+          winPlayer: this.winnerId,
+        },
+        toPlayerName: rival,
+      };
+    });
+
+    return responses;
   }
 }
 
