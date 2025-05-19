@@ -3,6 +3,7 @@ import {
   addPlayerCtrl,
   addShipsCtrl,
   addUserToRoomCtrl,
+  attackGameCtrl,
   createGameCtrl,
   createRoomCtrl,
   parseCommandCtrl,
@@ -13,7 +14,7 @@ import {
   updateRoomsCtrl,
   updateRoomsToAllCtrl,
 } from '../controllers';
-import { CommandType, Message } from '../models';
+import { AttackFeedbackDTO, CommandType, Message } from '../models';
 import { sendMessages } from './send-messages';
 
 export const handleDialog = (inMessage: Message): void => {
@@ -88,6 +89,19 @@ export const handleDialog = (inMessage: Message): void => {
       const { length, [length - 1]: lastOutMessage } = outMessages;
 
       if (lastOutMessage.command.type === CommandType.START_GAME) {
+        const outMessagesTurnGame = turnGameCtrl(inMessage);
+        outMessages.push(...outMessagesTurnGame);
+      }
+      break;
+    }
+    case CommandType.ATTACK: {
+      const outMessageAttack = attackGameCtrl(inMessage);
+      outMessages.push(...outMessageAttack);
+
+      const { length, [length - 1]: lastOutMessage } = outMessages;
+      const data = lastOutMessage.command.data as AttackFeedbackDTO;
+
+      if (data.status === 'miss') {
         const outMessagesTurnGame = turnGameCtrl(inMessage);
         outMessages.push(...outMessagesTurnGame);
       }

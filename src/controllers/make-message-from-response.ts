@@ -15,6 +15,9 @@ export const makeMessageFromResponse = (
 ): Message => {
   const command: Command = makeCommand(commandType);
   const { data, toPlayerName } = gameResponse;
+  if (data === undefined) {
+    command.type = CommandType.NOT_GET_IT;
+  }
   command.data = data;
   const outMessage: Message = {
     client: undefined as unknown as WebSocketClient,

@@ -153,12 +153,35 @@ export const turnGameCtrl = (inMessage: Message): Message[] => {
     command.data = `Turn Game. Game with id ${gameId} does not exist`;
     return [outMessage];
   }
-  
+
   const outMessages: Message[] = game
     .turn()
-    .map((response) =>
-      makeMessageFromResponse(CommandType.TURN, response)
-    );
+    .map((response) => makeMessageFromResponse(CommandType.TURN, response));
+
+  return outMessages;
+};
+
+export const attackGameCtrl = (inMessage: Message): Message[] => {
+  const command: Command = makeCommand(CommandType.ATTACK);
+  const outMessage: Message = {
+    ...inMessage,
+    direction: 'out',
+    command: command,
+  };
+  const data = inMessage.command.data as GameAttackDTO;
+  const gameId = data.gameId as number;
+
+  const game = Game.getGame(gameId);
+
+  if (!game) {
+    command.type = CommandType.NOT_GET_IT;
+    command.data = `Attack. Game with id ${gameId} does not exist`;
+    return [outMessage];
+  }
+  
+  const outMessages: Message[] = game
+    .attack(data)
+    .map((response) => makeMessageFromResponse(CommandType.ATTACK, response));
 
   return outMessages;
 };

@@ -1,21 +1,26 @@
 import { Board } from './board';
 import {
+  AttackFeedbackDTO,
+  GameAttackDTO,
   GameResponse,
   GameStartDTO,
   GameTurnDTO,
+  Position,
   Rival,
   Room,
   Ship,
 } from './models';
 
 type GameState = 'setup' | 'on' | 'over';
+type PlayerIndex = string;
 
 export class Game {
-  private rivals: Record<string, Rival> = {};
+  private rivals: Record<PlayerIndex, Rival> = {};
   private readonly roomId: number;
   private readonly gameId: number;
   private state: GameState = 'setup';
   private isFirstRivalTurn = true;
+  private winnerId: PlayerIndex = '';
 
   private static nextGameId = 1;
   private static games: Record<number, Game> = {};
@@ -98,5 +103,62 @@ export class Game {
     );
 
     return outputs;
+  }
+
+  getRival(attackerId: PlayerIndex): string {
+    return this.playersName.filter((rival) => rival !== attackerId)[0];
+  }
+
+  attack(
+    attackDTO: GameAttackDTO
+  ): GameResponse<AttackFeedbackDTO | undefined>[] {
+    const { indexPlayer, x, y } = attackDTO;
+    const attackerId = indexPlayer as string;
+    const position: Position = { x, y };
+
+    const victimId = this.getRival(attackerId);
+
+    const victimBoard = this.rivals[victimId].board;
+
+    if (!victimBoard) {
+      const response: GameResponse<undefined> = {
+        toPlayerName: attackerId,
+        data: undefined,
+      };
+      return [response];
+    }
+
+    const boardFeedbacks = victimBoard.attack(position);
+    if (victimBoard.checkNoMoreShips()) {
+      this.end(attackerId);
+    }
+
+    const responses: GameResponse<AttackFeedbackDTO>[] = [];
+
+    boardFeedbacks.forEach((entry) => {
+      const feedback: AttackFeedbackDTO = {
+        ...entry,
+        currentPlayer: attackerId,
+      };
+
+      const responseToAttacker: GameResponse<AttackFeedbackDTO> = {
+        data: { ...feedback },
+        toPlayerName: attackerId,
+      };
+      responses.push(responseToAttacker);
+
+      const responseToVictim: GameResponse<AttackFeedbackDTO> = {
+        data: { ...feedback },
+        toPlayerName: victimId,
+      };
+      responses.push(responseToVictim);
+    });
+
+    return responses;
+  }
+
+  private end(winnerId: PlayerIndex): void {
+    this.state = 'over';
+    this.winnerId = winnerId;
   }
 }
